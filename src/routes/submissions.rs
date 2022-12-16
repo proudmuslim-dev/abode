@@ -73,8 +73,6 @@ pub async fn confirm_submission(
     let new_post = pending_post.as_new_post();
     let id = new_post.id.clone();
 
-    // TODO: Remove entry from pending db
-
     let mut conn = db::util::establish_connection();
 
     new_post
