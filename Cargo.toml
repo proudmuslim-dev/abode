@@ -1,0 +1,44 @@
+[package]
+name = "abode-backend"
+version = "0.1.0"
+authors = ["Proudmuslim <proudmuslim-dev@protonmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+jsonwebtoken = "8.1.1"
+color-eyre = "0.6.2"
+lazy_static = "1.4.0"
+chrono = "0.4.23"
+paste = "1.0.9"
+pulldown-cmark = "0.9.2"
+ammonia = "3.2.1"
+
+[dependencies.rocket]
+version = "0.5.0-rc.2"
+features = ["json"]
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.validator]
+version = "0.16.0"
+features = ["derive"]
+
+[dependencies.sanitizer]
+version = "0.1.6"
+features = ["derive"]
+
+[dependencies.strum]
+version = "0.24.1"
+features = ["derive"]
+
+[dependencies.diesel]
+version = "2.0.2"
+features = ["sqlite"]
+
+[dependencies.uuid]
+version = "1.2.1"
+features = ["serde", "v4"]
