@@ -1,32 +1,33 @@
 use crate::{
     db,
-    db::{pending, pending::util::create_pending_post},
-    routes::util::{AuthHeader, Sections},
+    db::{
+        pending,
+        pending::util::{create_pending_post, remove_pending_post},
+    },
+    routes::util::{AuthHeader, AuthLevel, Sections, Verifiable},
 };
-
-use crate::routes::util::{AuthLevel, Verifiable};
 use ammonia::clean;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use pulldown_cmark::{html, Parser};
 use rocket::{
     form::{Form, Strict},
     http::Status,
-    serde::json::{json, Value},
+    response::Responder,
+    serde::json::{json, Json, Value},
+    Request, Response,
 };
 use sanitizer::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
-use crate::db::pending::util::remove_pending_post;
 
-// TODO: 201 response
 /// Returns the new post's [`Uuid`]
 #[post("/sections/<section>/submit", data = "<post>")]
 pub async fn new_submission(
     auth_header: AuthHeader,
     section: Sections,
     mut post: Form<Strict<PostSubmission>>,
-) -> Result<Value, Status> {
+) -> Result<PostSubmissionResponse, Status> {
     let c = auth_header.verify()?;
 
     post.validate().map_err(|_| Status::BadRequest)?;
@@ -52,7 +53,7 @@ pub async fn new_submission(
         },
     }
 
-    Ok(json!({ "id": id }))
+    Ok(PostSubmissionResponse { id: id.to_string() })
 }
 
 #[post("/sections/<section>/confirm", data = "<post>")]
@@ -68,7 +69,8 @@ pub async fn confirm_submission(
 
     let mut conn = pending::util::establish_connection();
 
-    let pending_post = pending::util::get_and_remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
+    let pending_post =
+        pending::util::get_and_remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
 
     let new_post = pending_post.as_new_post();
     let id = new_post.id.clone();
@@ -104,7 +106,7 @@ pub async fn reject_submission(
 fn db_err_to_status(e: DieselError) -> Status {
     match e {
         DieselError::NotFound => Status::NotFound,
-        _ => Status::InternalServerError
+        _ => Status::InternalServerError,
     }
 }
 
@@ -136,4 +138,17 @@ fn convert_and_sanitize(s: &str) -> String {
     html::push_html(&mut unsafe_html, md_parse);
 
     clean(unsafe_html.as_str())
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PostSubmissionResponse {
+    pub id: String,
+}
+
+impl<'r> Responder<'r, 'r> for PostSubmissionResponse {
+    fn respond_to(self, request: &'r Request<'_>) -> rocket::response::Result<'r> {
+        Response::build_from(Json(&self).respond_to(request)?)
+            .status(Status::Created)
+            .ok()
+    }
 }

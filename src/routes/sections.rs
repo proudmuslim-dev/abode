@@ -59,5 +59,3 @@ pub async fn section(section: Sections) -> Result<Value, Status> {
         Sections::Feminism => get_posts!(feminism),
     }
 }
-
-

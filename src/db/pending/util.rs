@@ -74,11 +74,7 @@ pub fn get_pending_post(conn: &mut SqliteConnection, post_id: String) -> QueryRe
     use crate::db::pending::schema::pending_posts::{dsl::pending_posts, id};
 
     let matches = {
-        match pending_posts
-            .filter(id.eq(post_id))
-            .limit(1)
-            .load::<PendingPost>(conn)
-        {
+        match pending_posts.filter(id.eq(post_id)).limit(1).load::<PendingPost>(conn) {
             Ok(v) => v,
             Err(e) => return Err(e),
         }
@@ -121,7 +117,11 @@ pub fn remove_pending_post(conn: &mut SqliteConnection, section: Sections, post_
     Ok(())
 }
 
-pub fn get_and_remove_pending_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<PendingPost> {
+pub fn get_and_remove_pending_post(
+    conn: &mut SqliteConnection,
+    section: Sections,
+    post_id: String,
+) -> QueryResult<PendingPost> {
     let post = get_pending_post(conn, post_id.clone())?;
 
     remove_pending_post(conn, section, post_id)?;
