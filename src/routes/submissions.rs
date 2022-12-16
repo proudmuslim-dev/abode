@@ -4,7 +4,7 @@ use crate::{
         pending,
         pending::util::{create_pending_post, remove_pending_post},
     },
-    routes::util::{AuthHeader, AuthLevel, Sections, Verifiable},
+    routes::util::{db_err_to_status, AuthHeader, AuthLevel, Sections, Verifiable},
 };
 use ammonia::clean;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
@@ -103,19 +103,12 @@ pub async fn reject_submission(
     Ok(json!({ "id": post.id }))
 }
 
-fn db_err_to_status(e: DieselError) -> Status {
-    match e {
-        DieselError::NotFound => Status::NotFound,
-        _ => Status::InternalServerError,
-    }
-}
-
 #[derive(FromForm, Deserialize, Validate, Sanitize)]
 pub struct PostConfirmation {
     // The length of a UUID v4 with dashes.
     #[sanitize(custom(sanitize_uuid))]
     #[validate(length(equal = 36))]
-    id: String,
+    pub(crate) id: String,
 }
 
 fn sanitize_uuid(s: &str) -> String {

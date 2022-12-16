@@ -1,5 +1,6 @@
 use crate::{
     db::{
+        delete_from_section,
         models::pending::{
             NewPendingFeminismEntry, NewPendingIslamismEntry, NewPendingModernityEntry, NewPendingPost,
             NewPendingSecularismEntry, PendingPost,
@@ -9,7 +10,6 @@ use crate::{
     routes::util::Sections,
 };
 use diesel::{result::Error, Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
-
 use uuid::Uuid;
 
 pub fn establish_connection() -> SqliteConnection {
@@ -88,30 +88,12 @@ pub fn get_pending_post(conn: &mut SqliteConnection, post_id: String) -> QueryRe
 }
 
 pub fn remove_pending_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<()> {
-    macro_rules! delete_from_section {
-        ($($variant:ident => $section:ident),*) => {
-            paste::paste! {
-                match section {
-                    $(
-                        Sections::$variant => {
-                            use crate::db::pending::schema::$section::{dsl::$section, post_id as pid};
-                            use crate::db::pending::schema::pending_posts::{dsl::pending_posts, id};
-
-                            diesel::delete($section.filter(pid.eq(post_id.clone()))).execute(conn)?;
-
-                            diesel::delete(pending_posts.filter(id.eq(post_id))).execute(conn)?;
-                        }
-                    )*
-                }
-            }
-        };
-    }
-
     delete_from_section!(
-            Islamism => islamism,
-            Modernity => modernity,
-            Secularism => secularism,
-            Feminism => feminism
+        pending_posts { section, post_id, conn },
+        Islamism => islamism,
+        Modernity => modernity,
+        Secularism => secularism,
+        Feminism => feminism
     );
 
     Ok(())

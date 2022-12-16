@@ -1,4 +1,5 @@
 use crate::routes::util::jwt::{verify_api_token, Claims};
+use diesel::result::Error as DieselError;
 use rocket::{
     form::{Form, Strict},
     http::Status,
@@ -79,6 +80,13 @@ pub struct LoginResponse {
 impl<'r> Responder<'r, 'r> for LoginResponse {
     fn respond_to(self, request: &'r Request<'_>) -> rocket::response::Result<'r> {
         Response::build_from(Json(&self).respond_to(request)?).ok()
+    }
+}
+
+pub fn db_err_to_status(e: DieselError) -> Status {
+    match e {
+        DieselError::NotFound => Status::NotFound,
+        _ => Status::InternalServerError,
     }
 }
 

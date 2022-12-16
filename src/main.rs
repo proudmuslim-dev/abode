@@ -2,6 +2,7 @@
 extern crate rocket;
 
 use abode_backend::routes::{
+    posts::delete_post,
     sections::{section, sections},
     sign_in::sign_in,
     sign_up::sign_up,
@@ -24,6 +25,7 @@ async fn rocket() -> _ {
             new_submission,
             confirm_submission,
             reject_submission,
+            delete_post,
             sign_in,
             sign_up
         ],
