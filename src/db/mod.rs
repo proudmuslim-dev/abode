@@ -27,8 +27,8 @@ pub(crate) use delete_from_section;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{db::models::pending::PendingPost, routes::util::Sections};
+    use super::{models::pending::PendingPost, *};
+    use crate::routes::util::Sections;
     use std::error::Error;
     use uuid::Uuid;
 

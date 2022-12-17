@@ -13,4 +13,9 @@ mod tests {
     async fn no_auth_routes() {
         // TODO: Merge frontend & backend into a single project
     }
+
+    #[tokio::test]
+    async fn auth_routes() {
+        // See above
+    }
 }
