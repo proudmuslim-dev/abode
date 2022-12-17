@@ -5,7 +5,7 @@ use crate::db::{
 use serde::Serialize;
 use uuid::Uuid;
 
-#[derive(Queryable, Serialize, Clone)]
+#[derive(Queryable, Serialize, PartialEq, Eq, Debug, Clone)]
 pub struct PendingPost {
     pub id: String,
     pub author_id: String,

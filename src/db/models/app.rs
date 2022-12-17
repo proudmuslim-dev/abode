@@ -44,7 +44,7 @@ pub struct NewPost<'a> {
 
 impl<'a> NewPost<'a> {
     /// Inserts the post into the posts table
-    pub(crate) fn insert(&self, section: Sections, conn: &mut SqliteConnection) -> QueryResult<()> {
+    pub(crate) fn insert(&self, conn: &mut SqliteConnection, section: Sections) -> QueryResult<()> {
         // TODO: Duplicate UUID handling
         self.insert_into(posts::table).execute(conn)?;
 

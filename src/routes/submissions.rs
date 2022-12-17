@@ -78,7 +78,7 @@ pub async fn confirm_submission(
     let mut conn = db::util::establish_connection();
 
     new_post
-        .insert(section, &mut conn)
+        .insert(&mut conn, section)
         .map_err(|_| Status::InternalServerError)?;
 
     Ok(json!({ "id": id }))
