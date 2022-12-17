@@ -3,7 +3,10 @@ use crate::{
         utils,
         utils::pending::{create_pending_post, remove_pending_post},
     },
-    routes::util::{db_err_to_status, AuthHeader, AuthLevel, Sections, Verifiable},
+    routes::utils::{
+        headers::{AuthHeader, AuthLevel, Verifiable},
+        misc::{db_err_to_status, Sections},
+    },
 };
 use ammonia::clean;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};

@@ -1,10 +1,8 @@
-use crate::{
-    db::{models::app::Post, utils::app::establish_connection},
-    routes::util::Sections,
-};
+use crate::db::{models::app::Post, utils::app::establish_connection};
 
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 
+use crate::routes::utils::misc::Sections;
 use rocket::{
     http::Status,
     serde::json::{json, Value},

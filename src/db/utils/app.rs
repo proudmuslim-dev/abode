@@ -4,7 +4,7 @@ use crate::{
         models::app::{NewUser, User},
         schemas::app as schema,
     },
-    routes::util::{jwt::generate_api_token, Sections},
+    routes::utils::{jwt::generate_api_token, misc::Sections},
 };
 use color_eyre::eyre::Context;
 use diesel::{Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};

@@ -1,11 +1,12 @@
 use crate::{
     db::utils::app::{establish_connection, remove_post},
-    routes::{
-        submissions::PostConfirmation,
-        util::{db_err_to_status, AuthHeader, AuthLevel, Sections, Verifiable},
-    },
+    routes::submissions::PostConfirmation,
 };
 
+use crate::routes::utils::{
+    headers::{AuthHeader, AuthLevel, Verifiable},
+    misc::{db_err_to_status, Sections},
+};
 use rocket::{
     form::{Form, Strict},
     http::Status,

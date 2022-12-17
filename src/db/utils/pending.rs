@@ -7,7 +7,7 @@ use crate::{
         },
         schemas::pending as schema,
     },
-    routes::util::Sections,
+    routes::utils::misc::Sections,
 };
 use diesel::{result::Error, Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
 use uuid::Uuid;

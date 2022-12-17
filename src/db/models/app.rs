@@ -3,7 +3,7 @@ use crate::{
         models::section,
         schemas::app::{feminism, islamism, modernity, posts, secularism, users},
     },
-    routes::util::Sections,
+    routes::utils::misc::Sections,
 };
 use diesel::{Insertable, QueryResult, RunQueryDsl, SqliteConnection};
 use serde::Serialize;

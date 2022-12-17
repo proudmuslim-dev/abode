@@ -1,6 +1,9 @@
 use crate::{
     db::utils,
-    routes::util::{sanitize_and_validate, validate_username, LoginResponse},
+    routes::utils::{
+        misc::{sanitize_and_validate, validate_username},
+        responses::LoginResponse,
+    },
 };
 use rocket::{
     form::{Form, Strict},
