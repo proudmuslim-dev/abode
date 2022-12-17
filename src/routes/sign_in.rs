@@ -1,5 +1,5 @@
 use crate::{
-    db::util,
+    db::utils,
     routes::util::{jwt::generate_api_token, sanitize_and_validate, validate_username, LoginResponse},
 };
 use rocket::{
@@ -19,7 +19,7 @@ pub async fn sign_in(login: Form<Strict<LoginForm>>) -> Result<LoginResponse, St
         None => return Err(Status::BadRequest),
     };
 
-    let db_res = match util::get_user(&mut util::establish_connection(), login.username.as_str()) {
+    let db_res = match utils::app::get_user(&mut utils::app::establish_connection(), login.username.as_str()) {
         Some(res) => res,
         None => return Err(Status::Unauthorized),
     };

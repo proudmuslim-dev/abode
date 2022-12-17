@@ -1,6 +1,6 @@
 use crate::db::{
     models::{app::NewPost, section},
-    pending::schema::{feminism, islamism, modernity, pending_posts, secularism},
+    schemas::pending::{feminism, islamism, modernity, pending_posts, secularism},
 };
 use serde::Serialize;
 use uuid::Uuid;

@@ -1,5 +1,5 @@
 use crate::{
-    db::{util, util::establish_connection},
+    db::utils,
     routes::util::{sanitize_and_validate, validate_username, LoginResponse},
 };
 use rocket::{
@@ -19,8 +19,8 @@ pub async fn sign_up(signup: Form<Strict<SignUpForm>>) -> Result<LoginResponse, 
     };
 
     // TODO: Improve error handling, notify if username is taken
-    match util::create_user(
-        &mut establish_connection(),
+    match utils::app::create_user(
+        &mut utils::app::establish_connection(),
         Uuid::new_v4(),
         signup.username.as_str(),
         signup.password.as_str(),

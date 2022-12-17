@@ -5,7 +5,7 @@ use crate::{
             NewPendingFeminismEntry, NewPendingIslamismEntry, NewPendingModernityEntry, NewPendingPost,
             NewPendingSecularismEntry, PendingPost,
         },
-        pending::schema,
+        schemas::pending as schema,
     },
     routes::util::Sections,
 };
@@ -46,7 +46,7 @@ pub fn create_pending_post(
                 match section {
                     $(
                         Sections::$variant => {
-                            use crate::db::pending::schema::$section;
+                            use crate::db::schemas::pending::$section;
 
                             diesel::insert_into($section::table)
                                 .values([<New Pending $variant Entry>] {
@@ -71,7 +71,7 @@ pub fn create_pending_post(
 }
 
 pub fn get_pending_post(conn: &mut SqliteConnection, post_id: String) -> QueryResult<PendingPost> {
-    use crate::db::pending::schema::pending_posts::{dsl::pending_posts, id};
+    use schema::pending_posts::{dsl::pending_posts, id};
 
     let matches = {
         match pending_posts.filter(id.eq(post_id)).limit(1).load::<PendingPost>(conn) {

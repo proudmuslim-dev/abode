@@ -1,7 +1,7 @@
 use crate::{
     db::{
         models::section,
-        schema::{feminism, islamism, modernity, posts, secularism, users},
+        schemas::app::{feminism, islamism, modernity, posts, secularism, users},
     },
     routes::util::Sections,
 };

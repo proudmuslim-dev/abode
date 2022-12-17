@@ -1,8 +1,7 @@
 use crate::{
-    db,
     db::{
-        pending,
-        pending::util::{create_pending_post, remove_pending_post},
+        utils,
+        utils::pending::{create_pending_post, remove_pending_post},
     },
     routes::util::{db_err_to_status, AuthHeader, AuthLevel, Sections, Verifiable},
 };
@@ -34,7 +33,7 @@ pub async fn new_submission(
     post.sanitize();
 
     let mut id = Uuid::new_v4();
-    let mut conn = pending::util::establish_connection();
+    let mut conn = utils::pending::establish_connection();
 
     let excerpt = post.excerpt.as_str();
     let citation = post.citation.as_str();
@@ -67,15 +66,15 @@ pub async fn confirm_submission(
     post.sanitize();
     post.validate().map_err(|_| Status::BadRequest)?;
 
-    let mut conn = pending::util::establish_connection();
+    let mut conn = utils::pending::establish_connection();
 
     let pending_post =
-        pending::util::get_and_remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
+        utils::pending::get_and_remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
 
     let new_post = pending_post.as_new_post();
     let id = new_post.id.clone();
 
-    let mut conn = db::util::establish_connection();
+    let mut conn = utils::app::establish_connection();
 
     new_post
         .insert(&mut conn, section)
@@ -96,7 +95,7 @@ pub async fn reject_submission(
     post.sanitize();
     post.validate().map_err(|_| Status::BadRequest)?;
 
-    let mut conn = pending::util::establish_connection();
+    let mut conn = utils::pending::establish_connection();
 
     remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
 

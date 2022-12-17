@@ -1,5 +1,5 @@
 use crate::{
-    db::{models::app::Post, util::establish_connection},
+    db::{models::app::Post, utils::app::establish_connection},
     routes::util::Sections,
 };
 
@@ -24,7 +24,7 @@ pub async fn section(section: Sections) -> Result<Value, Status> {
         ($name:ident) => {
             paste::paste! {
                 {
-                    use crate::db::schema::$name::dsl::*;
+                    use crate::db::schemas::app::$name::dsl::*;
 
                     let post_ids: Vec<String> = match $name.select(post_id).load::<String>(&mut conn) {
                         Ok(a) => a,
@@ -32,7 +32,7 @@ pub async fn section(section: Sections) -> Result<Value, Status> {
                     };
 
                     let results: Vec<QueryResult<Post>> = post_ids.into_iter().map(|s| {
-                        use crate::db::schema::posts::dsl::{posts, id};
+                        use crate::db::schemas::app::posts::dsl::{posts, id};
 
                         posts.filter(id.eq(s)).first(&mut conn)
                     }).collect();

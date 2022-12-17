@@ -2,7 +2,7 @@ use crate::{
     db::{
         delete_from_section,
         models::app::{NewUser, User},
-        schema,
+        schemas::app as schema,
     },
     routes::util::{jwt::generate_api_token, Sections},
 };

@@ -1,5 +1,5 @@
 use crate::{
-    db::util::{establish_connection, remove_post},
+    db::utils::app::{establish_connection, remove_post},
     routes::{
         submissions::PostConfirmation,
         util::{db_err_to_status, AuthHeader, AuthLevel, Sections, Verifiable},

@@ -1,7 +1,6 @@
 pub mod models;
-pub mod pending;
-pub mod schema;
-pub mod util;
+pub mod schemas;
+pub mod utils;
 
 macro_rules! delete_from_section {
     ($posts:ident { $post_section:ident, $post_id:ident, $conn:ident }, $($variant:ident => $section:ident),*) => {
@@ -34,7 +33,7 @@ mod tests {
 
     #[test]
     fn test_util() -> Result<(), Box<dyn Error>> {
-        let mut conn = util::establish_connection();
+        let mut conn = utils::app::establish_connection();
         let uid = Uuid::new_v4();
         let username = uid.to_string();
         let pass = "testing".to_owned();
@@ -42,10 +41,10 @@ mod tests {
         // Needed to ensure that the create_user function doesn't panic due to the fact
         // that it generates a JWT.
         std::env::set_var("ENCODING_SECRET", "jivcwtuR5QIHvAuNMnK7rrtB");
-        util::create_user(&mut conn, uid, username.as_str(), pass.as_str())?;
+        utils::app::create_user(&mut conn, uid, username.as_str(), pass.as_str())?;
 
-        util::get_user(&mut conn, username.as_str()).ok_or("Failed to get user!")?;
-        util::get_user_uid(&mut conn, uid).ok_or("Failed to get user via UUID!")?;
+        utils::app::get_user(&mut conn, username.as_str()).ok_or("Failed to get user!")?;
+        utils::app::get_user_uid(&mut conn, uid).ok_or("Failed to get user via UUID!")?;
 
         // pid would be too confusing lol
         let pending_post_id = Uuid::new_v4();
@@ -57,9 +56,9 @@ mod tests {
         };
         let section = Sections::Islamism;
 
-        conn = pending::util::establish_connection();
+        conn = utils::pending::establish_connection();
 
-        pending::util::create_pending_post(
+        utils::pending::create_pending_post(
             &mut conn,
             section,
             pending_post_id,
@@ -68,16 +67,16 @@ mod tests {
             post.citation.as_str(),
         )?;
 
-        let _post = pending::util::get_and_remove_pending_post(&mut conn, section, pending_post_id.to_string())?;
+        let _post = utils::pending::get_and_remove_pending_post(&mut conn, section, pending_post_id.to_string())?;
 
         assert_eq!(post, _post);
 
-        conn = util::establish_connection();
+        conn = utils::app::establish_connection();
 
         let np = post.as_new_post();
         np.insert(&mut conn, section)?;
 
-        util::remove_post(&mut conn, section, np.id)?;
+        utils::app::remove_post(&mut conn, section, np.id)?;
 
         // TODO: Delete user helper + route
 

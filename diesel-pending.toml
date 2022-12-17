@@ -2,7 +2,7 @@
 # see https://diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "src/db/pending/schema.rs"
+file = "src/db/schemas/pending.rs"
 
 [migrations_directory]
 dir = "migrations/pending_posts"
