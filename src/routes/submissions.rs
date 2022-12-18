@@ -5,7 +5,7 @@ use crate::{
     },
     routes::utils::{
         headers::{AuthHeader, AuthLevel, Verifiable},
-        misc::{db_err_to_status, Sections},
+        misc::{db_err_to_status, Sections, UuidField},
     },
 };
 use ammonia::clean;
@@ -21,7 +21,6 @@ use rocket::{
 use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::Validate;
 
 /// Returns the new post's [`Uuid`]
 #[post("/sections/<section>/submit", data = "<post>")]
@@ -32,7 +31,6 @@ pub async fn new_submission(
 ) -> Result<PostSubmissionResponse, Status> {
     let c = auth_header.verify()?;
 
-    post.validate().map_err(|_| Status::BadRequest)?;
     post.sanitize();
 
     let mut id = Uuid::new_v4();
@@ -62,17 +60,14 @@ pub async fn new_submission(
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Sections,
-    mut post: Form<Strict<PostConfirmation>>,
+    post: Form<Strict<PostConfirmation>>,
 ) -> Result<Value, Status> {
     let _c = auth_header.verify()?;
 
-    post.sanitize();
-    post.validate().map_err(|_| Status::BadRequest)?;
-
+    let id = post.id.to_string();
     let mut conn = utils::pending::establish_connection();
 
-    let pending_post =
-        utils::pending::get_and_remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
+    let pending_post = utils::pending::get_and_remove_pending_post(&mut conn, section, id).map_err(db_err_to_status)?;
 
     let new_post = pending_post.as_new_post();
     let id = new_post.id.clone();
@@ -91,39 +86,30 @@ pub async fn confirm_submission(
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Sections,
-    mut post: Form<Strict<PostConfirmation>>,
+    post: Form<Strict<PostConfirmation>>,
 ) -> Result<Value, Status> {
     let _c = auth_header.verify()?;
 
-    post.sanitize();
-    post.validate().map_err(|_| Status::BadRequest)?;
-
+    let id = post.id.to_string();
     let mut conn = utils::pending::establish_connection();
 
-    remove_pending_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
+    remove_pending_post(&mut conn, section, id.clone()).map_err(db_err_to_status)?;
 
-    Ok(json!({ "id": post.id }))
+    Ok(json!({ "id": id }))
 }
 
-#[derive(FromForm, Deserialize, Validate, Sanitize)]
+#[derive(FromForm)]
 pub struct PostConfirmation {
-    // The length of a UUID v4 with dashes.
-    #[sanitize(custom(sanitize_uuid))]
-    #[validate(length(equal = 36))]
-    pub(crate) id: String,
+    pub(crate) id: UuidField,
 }
 
-fn sanitize_uuid(s: &str) -> String {
-    s.chars().filter(|c| !c.is_whitespace() && c.is_ascii()).collect()
-}
-
-#[derive(FromForm, Deserialize, Validate, Sanitize)]
+#[derive(FromForm, Deserialize, Sanitize)]
 pub struct PostSubmission {
     #[sanitize(trim, custom(convert_and_sanitize))]
-    #[validate(length(min = 10))]
+    #[field(validate = len(10..1500))]
     pub excerpt: String,
     #[sanitize(trim, custom(convert_and_sanitize))]
-    #[validate(length(min = 10))]
+    #[field(validate = len(10..200))]
     pub citation: String,
 }
 

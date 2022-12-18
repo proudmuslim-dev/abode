@@ -1,34 +1,32 @@
 use crate::{
     db::utils::app::{establish_connection, remove_post},
-    routes::submissions::PostConfirmation,
-};
-
-use crate::routes::utils::{
-    headers::{AuthHeader, AuthLevel, Verifiable},
-    misc::{db_err_to_status, Sections},
+    routes::{
+        submissions::PostConfirmation,
+        utils::{
+            headers::{AuthHeader, AuthLevel, Verifiable},
+            misc::{db_err_to_status, Sections},
+        },
+    },
 };
 use rocket::{
     form::{Form, Strict},
     http::Status,
     serde::json::{json, Value},
 };
-use sanitizer::Sanitize;
-use validator::Validate;
 
 #[delete("/sections/<section>", data = "<post>")]
 pub async fn delete_post(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Sections,
-    mut post: Form<Strict<PostConfirmation>>,
+    post: Form<Strict<PostConfirmation>>,
 ) -> Result<Value, Status> {
     let _c = auth_header.verify()?;
 
-    post.validate().map_err(|_| Status::BadRequest)?;
-    post.sanitize();
+    let id = post.id.to_string();
 
     let mut conn = establish_connection();
 
-    remove_post(&mut conn, section, post.id.clone()).map_err(db_err_to_status)?;
+    remove_post(&mut conn, section, id.clone()).map_err(db_err_to_status)?;
 
-    Ok(json!({ "id": post.id }))
+    Ok(json!({ "id": id }))
 }
