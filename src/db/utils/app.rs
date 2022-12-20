@@ -1,13 +1,13 @@
 use crate::{
     db::{
         delete_from_section,
-        models::app::{NewUser, User},
+        models::app::{FeminismEntry, IslamismEntry, ModernityEntry, NewUser, Post, SecularismEntry, User},
         schemas::app as schema,
     },
     routes::utils::{jwt::generate_api_token, misc::Sections},
 };
 use color_eyre::eyre::Context;
-use diesel::{Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
+use diesel::{result::Error, Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
 use uuid::Uuid;
 
 pub fn establish_connection() -> SqliteConnection {
@@ -63,6 +63,45 @@ pub fn get_user_uid(conn: &mut SqliteConnection, uid: Uuid) -> Option<User> {
         Ok(u) => Some(u),
         Err(_) => None,
     }
+}
+
+pub fn get_post(conn: &mut SqliteConnection, section: Sections, pid: String) -> QueryResult<Post> {
+    use crate::db::schemas::app::posts::{dsl::posts, id};
+
+    macro_rules! get_from_section {
+        ($($variant:ident => $section:ident),*) => {
+            paste::paste! {
+                match section {
+                    $(
+                        Sections::$variant => {
+                            use crate::db::schemas::app::$section::{dsl::$section, post_id};
+
+                            let s_matches = $section.filter(post_id.eq(pid.clone())).limit(1).load::<[<$variant Entry>]>(conn)?;
+
+                            if s_matches.is_empty() {
+                                return Err(Error::NotFound);
+                            }
+
+                            let matches = posts.filter(id.eq(pid)).limit(1).load::<Post>(conn)?;
+
+                            if matches.is_empty() {
+                                Err(Error::NotFound)
+                            } else {
+                                Ok(matches[0].clone())
+                            }
+                        }
+                    )*
+                }
+            }
+        };
+    }
+
+    get_from_section!(
+        Islamism => islamism,
+        Modernity => modernity,
+        Secularism => secularism,
+        Feminism => feminism
+    )
 }
 
 pub fn remove_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<()> {

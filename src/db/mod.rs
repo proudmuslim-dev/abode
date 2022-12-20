@@ -22,7 +22,46 @@ macro_rules! delete_from_section {
     };
 }
 
+macro_rules! get_posts {
+    ($section:ident, $conn:ident, pending) => {
+        get_posts!(pending, pending_posts { crate::db::models::pending::PendingPost }, $section, $conn)
+    };
+    ($section:ident, $conn:ident) => {
+        get_posts!(app, posts { crate::db::models::app::Post }, $section, $conn)
+    };
+    ($db:ident, $posts:ident { $post_type:ty }, $section:ident, $conn:ident) => {
+        paste::paste! {
+            {
+                use crate::db::schemas::$db::$section::dsl::*;
+
+                let post_ids: Vec<String> = match $section.select(post_id).load::<String>(&mut $conn) {
+                    Ok(a) => a,
+                    Err(_) => return Err(Status::InternalServerError),
+                };
+
+                let results: Vec<QueryResult<$post_type>> = post_ids.into_iter().map(|s| {
+                    use crate::db::schemas::$db::$posts::dsl::{$posts, id};
+
+                    $posts.filter(id.eq(s)).first(&mut $conn)
+                }).collect();
+
+                let mut posts = vec![];
+
+                for x in results {
+                    match x {
+                        Ok(p) =>  posts.push(p),
+                        Err(_) => return Err(Status::InternalServerError)
+                    }
+                }
+
+                Ok(Json(posts))
+            }
+        }
+    };
+}
+
 pub(crate) use delete_from_section;
+pub(crate) use get_posts;
 
 #[cfg(test)]
 mod tests {

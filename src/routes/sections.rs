@@ -1,11 +1,18 @@
 use crate::{
-    db::{models::app::Post, utils::app::establish_connection},
-    routes::utils::misc::Sections,
+    db::{
+        get_posts,
+        models::{app::Post, pending::PendingPost},
+        utils,
+    },
+    routes::utils::{
+        headers::{AuthHeader, AuthLevel, Verifiable},
+        misc::Sections,
+    },
 };
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use rocket::{
     http::Status,
-    serde::json::{json, Value},
+    serde::json::{json, Json, Value},
 };
 
 #[get("/sections")]
@@ -13,47 +20,58 @@ pub async fn sections() -> Value {
     json!(Sections::ALL)
 }
 
-/// Returns a list of [`Post`] instances
+// TODO: Remove the need for the `append_conn` macros by creating helpers
+// + add helpers to tests
+
 #[get("/sections/<section>")]
-pub async fn section(section: Sections) -> Result<Value, Status> {
-    let mut conn = establish_connection();
+pub async fn section(section: Sections) -> Result<Json<Vec<Post>>, Status> {
+    let mut conn = utils::app::establish_connection();
 
-    macro_rules! get_posts {
-        ($name:ident) => {
+    macro_rules! append_conn {
+        ($($variant:ty => $section:ident),*) => {
             paste::paste! {
-                {
-                    use crate::db::schemas::app::$name::dsl::*;
-
-                    let post_ids: Vec<String> = match $name.select(post_id).load::<String>(&mut conn) {
-                        Ok(a) => a,
-                        Err(_) => return Err(Status::InternalServerError),
-                    };
-
-                    let results: Vec<QueryResult<Post>> = post_ids.into_iter().map(|s| {
-                        use crate::db::schemas::app::posts::dsl::{posts, id};
-
-                        posts.filter(id.eq(s)).first(&mut conn)
-                    }).collect();
-
-                    let mut posts = vec![];
-
-                    for x in results {
-                        match x {
-                            Ok(p) =>  posts.push(p),
-                            Err(_) => return Err(Status::InternalServerError)
-                        }
-                    }
-
-                    Ok(json!(posts))
+                match section {
+                    $(
+                        Sections::$variant => get_posts!($section, conn),
+                    )*
                 }
             }
-        };
+        }
     }
 
-    match section {
-        Sections::Islamism => get_posts!(islamism),
-        Sections::Modernity => get_posts!(modernity),
-        Sections::Secularism => get_posts!(secularism),
-        Sections::Feminism => get_posts!(feminism),
+    append_conn!(
+        Islamism => islamism,
+        Modernity => modernity,
+        Secularism => secularism,
+        Feminism => feminism
+    )
+}
+
+#[get("/sections/<section>/pending")]
+pub async fn section_pending(
+    auth_header: AuthHeader<{ AuthLevel::Admin }>,
+    section: Sections,
+) -> Result<Json<Vec<PendingPost>>, Status> {
+    let _c = auth_header.verify()?;
+
+    let mut conn = utils::pending::establish_connection();
+
+    macro_rules! append_conn {
+        ($($variant:ty => $section:ident),*) => {
+            paste::paste! {
+                match section {
+                    $(
+                        Sections::$variant => get_posts!($section, conn, pending),
+                    )*
+                }
+            }
+        }
     }
+
+    append_conn!(
+        Islamism => islamism,
+        Modernity => modernity,
+        Secularism => secularism,
+        Feminism => feminism
+    )
 }

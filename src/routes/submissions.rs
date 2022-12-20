@@ -1,5 +1,6 @@
 use crate::{
     db::{
+        models::pending::PendingPost,
         utils,
         utils::pending::{create_pending_post, remove_pending_post},
     },
@@ -21,6 +22,21 @@ use rocket::{
 use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+#[get("/sections/<section>/pending?<id>")]
+pub async fn get_submission(
+    auth_header: AuthHeader<{ AuthLevel::Admin }>,
+    section: Sections,
+    id: UuidField,
+) -> Result<Json<PendingPost>, Status> {
+    let _c = auth_header.verify()?;
+
+    let mut conn = utils::pending::establish_connection();
+
+    let ret = utils::pending::get_pending_post(&mut conn, section, id.to_string()).map_err(db_err_to_status)?;
+
+    Ok(Json(ret))
+}
 
 /// Returns the new post's [`Uuid`]
 #[post("/sections/<section>/submit", data = "<post>")]

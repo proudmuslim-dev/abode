@@ -16,7 +16,7 @@ pub struct User {
     pub admin: bool,
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Clone)]
 pub struct Post {
     pub id: String,
     pub author_id: String,

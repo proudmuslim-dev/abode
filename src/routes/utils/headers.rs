@@ -4,7 +4,6 @@ use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
-use std::convert::Infallible;
 
 pub struct AuthHeader<const T: AuthLevel = { AuthLevel::User }> {
     pub(crate) token: String,
@@ -16,16 +15,16 @@ macro_rules! impl_from_req {
             $(
                 #[rocket::async_trait]
                 impl<'a> FromRequest<'a> for AuthHeader<{ $t }> {
-                    // TODO: Better error handling
-                    type Error = Infallible;
+                    type Error = Box<dyn std::error::Error>;
 
                     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
+                        let val = match request.headers().get_one("Authorization") {
+                            None => return Outcome::Failure((Status::Unauthorized, "Missing Authorization header!".into())),
+                            Some(s) => s,
+                        };
+
                         Outcome::Success(AuthHeader {
-                            token: request
-                                .headers()
-                                .get_one("Authorization")
-                                .unwrap()
-                                .replace("Bearer ", ""),
+                            token: val.replace("Bearer ", ""),
                         })
                     }
                 }

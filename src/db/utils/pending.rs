@@ -3,7 +3,7 @@ use crate::{
         delete_from_section,
         models::pending::{
             NewPendingFeminismEntry, NewPendingIslamismEntry, NewPendingModernityEntry, NewPendingPost,
-            NewPendingSecularismEntry, PendingPost,
+            NewPendingSecularismEntry, PendingIslamismEntry, PendingPost,
         },
         schemas::pending as schema,
     },
@@ -70,21 +70,43 @@ pub fn create_pending_post(
     Ok(())
 }
 
-pub fn get_pending_post(conn: &mut SqliteConnection, post_id: String) -> QueryResult<PendingPost> {
+pub fn get_pending_post(conn: &mut SqliteConnection, section: Sections, pid: String) -> QueryResult<PendingPost> {
     use schema::pending_posts::{dsl::pending_posts, id};
 
-    let matches = {
-        match pending_posts.filter(id.eq(post_id)).limit(1).load::<PendingPost>(conn) {
-            Ok(v) => v,
-            Err(e) => return Err(e),
-        }
-    };
+    macro_rules! get_from_section {
+        ($($variant:ident => $section:ident),*) => {
+            paste::paste! {
+                match section {
+                    $(
+                        Sections::$variant => {
+                            use schema::$section::{dsl::$section, post_id};
 
-    if matches.is_empty() {
-        Err(Error::NotFound)
-    } else {
-        Ok(matches[0].clone())
+                            let s_matches = $section.filter(post_id.eq(pid.clone())).limit(1).load::<PendingIslamismEntry>(conn)?;
+
+                            if s_matches.is_empty() {
+                                return Err(Error::NotFound);
+                            }
+
+                            let matches = pending_posts.filter(id.eq(pid)).limit(1).load::<PendingPost>(conn)?;
+
+                            if matches.is_empty() {
+                                Err(Error::NotFound)
+                            } else {
+                                Ok(matches[0].clone())
+                            }
+                        }
+                    )*
+                }
+            }
+        };
     }
+
+    get_from_section!(
+        Islamism => islamism,
+        Modernity => modernity,
+        Secularism => secularism,
+        Feminism => feminism
+    )
 }
 
 pub fn remove_pending_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<()> {
@@ -104,7 +126,7 @@ pub fn get_and_remove_pending_post(
     section: Sections,
     post_id: String,
 ) -> QueryResult<PendingPost> {
-    let post = get_pending_post(conn, post_id.clone())?;
+    let post = get_pending_post(conn, section, post_id.clone())?;
 
     remove_pending_post(conn, section, post_id)?;
 
