@@ -1,6 +1,6 @@
 use crate::{
     db::{
-        delete_from_section,
+        delete_from_section, get_section_posts, get_user_posts,
         models::pending::{
             NewPendingFeminismEntry, NewPendingIslamismEntry, NewPendingModernityEntry, NewPendingPost,
             NewPendingSecularismEntry, PendingIslamismEntry, PendingPost,
@@ -107,6 +107,20 @@ pub fn get_pending_post(conn: &mut SqliteConnection, section: Sections, pid: Str
         Secularism => secularism,
         Feminism => feminism
     )
+}
+
+pub fn get_user_pending_posts(
+    conn: &mut SqliteConnection,
+    section: Sections,
+    uid: String,
+) -> QueryResult<Vec<PendingPost>> {
+    Ok(get_user_posts!(
+        pending,
+        pending_posts { PendingPost },
+        section,
+        conn,
+        uid
+    ))
 }
 
 pub fn remove_pending_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<()> {

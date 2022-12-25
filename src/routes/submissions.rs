@@ -2,7 +2,7 @@ use crate::{
     db::{
         models::pending::PendingPost,
         utils,
-        utils::pending::{create_pending_post, remove_pending_post},
+        utils::pending::{create_pending_post, get_user_pending_posts, remove_pending_post},
     },
     routes::utils::{
         headers::{AuthHeader, AuthLevel, Verifiable},
@@ -23,7 +23,7 @@ use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[get("/sections/<section>/pending?<id>")]
+#[get("/sections/<section>/pending?<id>", rank = 1)]
 pub async fn get_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Sections,
@@ -36,6 +36,22 @@ pub async fn get_submission(
     let ret = utils::pending::get_pending_post(&mut conn, section, id.to_string()).map_err(db_err_to_status)?;
 
     Ok(Json(ret))
+}
+
+#[get("/sections/<section>/pending?<author>", rank = 2)]
+pub async fn get_author_submissions(
+    auth_header: AuthHeader<{ AuthLevel::Admin }>,
+    section: Sections,
+    author: UuidField,
+) -> Result<Json<Vec<PendingPost>>, Status> {
+    let _c = auth_header.verify()?;
+
+    let mut conn = utils::pending::establish_connection();
+
+    let posts =
+        get_user_pending_posts(&mut conn, section, author.to_string()).map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(posts))
 }
 
 /// Returns the new post's [`Uuid`]

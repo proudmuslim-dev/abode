@@ -1,13 +1,15 @@
 use crate::{
     db::{
-        delete_from_section,
+        delete_from_section, get_section_posts, get_user_posts,
         models::app::{FeminismEntry, IslamismEntry, ModernityEntry, NewUser, Post, SecularismEntry, User},
         schemas::app as schema,
     },
     routes::utils::{jwt::generate_api_token, misc::Sections},
 };
 use color_eyre::eyre::Context;
-use diesel::{result::Error, Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
+use diesel::{
+    result::Error as DieselError, Connection, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection,
+};
 use uuid::Uuid;
 
 pub fn establish_connection() -> SqliteConnection {
@@ -79,13 +81,13 @@ pub fn get_post(conn: &mut SqliteConnection, section: Sections, pid: String) -> 
                             let s_matches = $section.filter(post_id.eq(pid.clone())).limit(1).load::<[<$variant Entry>]>(conn)?;
 
                             if s_matches.is_empty() {
-                                return Err(Error::NotFound);
+                                return Err(DieselError::NotFound);
                             }
 
                             let matches = posts.filter(id.eq(pid)).limit(1).load::<Post>(conn)?;
 
                             if matches.is_empty() {
-                                Err(Error::NotFound)
+                                Err(DieselError::NotFound)
                             } else {
                                 Ok(matches[0].clone())
                             }
@@ -102,6 +104,12 @@ pub fn get_post(conn: &mut SqliteConnection, section: Sections, pid: String) -> 
         Secularism => secularism,
         Feminism => feminism
     )
+}
+
+// TODO: Consider adding author ID as a column & foreign key in the section
+// entries
+pub fn get_user_posts(conn: &mut SqliteConnection, section: Sections, uid: String) -> QueryResult<Vec<Post>> {
+    Ok(get_user_posts!(app, posts { Post }, section, conn, uid))
 }
 
 pub fn remove_post(conn: &mut SqliteConnection, section: Sections, post_id: String) -> QueryResult<()> {

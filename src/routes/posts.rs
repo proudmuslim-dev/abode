@@ -2,7 +2,7 @@ use crate::{
     db::{
         models::app::Post,
         utils,
-        utils::app::{establish_connection, remove_post},
+        utils::app::{establish_connection, get_user_posts, remove_post},
     },
     routes::{
         submissions::PostConfirmation,
@@ -18,13 +18,22 @@ use rocket::{
     serde::json::{json, Json, Value},
 };
 
-#[get("/sections/<section>?<id>")]
+#[get("/sections/<section>?<id>", rank = 1)]
 pub async fn get_post(section: Sections, id: UuidField) -> Result<Json<Post>, Status> {
     let mut conn = establish_connection();
 
     let post = utils::app::get_post(&mut conn, section, id.to_string()).map_err(db_err_to_status)?;
 
     Ok(Json(post))
+}
+
+#[get("/sections/<section>?<author>", rank = 2)]
+pub async fn get_author_posts(section: Sections, author: UuidField) -> Result<Json<Vec<Post>>, Status> {
+    let mut conn = establish_connection();
+
+    let posts = get_user_posts(&mut conn, section, author.to_string()).map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(posts))
 }
 
 #[delete("/sections/<section>", data = "<post>")]

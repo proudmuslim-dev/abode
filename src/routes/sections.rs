@@ -23,7 +23,7 @@ pub async fn sections() -> Value {
 // TODO: Remove the need for the `append_conn` macros by creating helpers
 // + add helpers to tests
 
-#[get("/sections/<section>")]
+#[get("/sections/<section>", rank = 3)]
 pub async fn section(section: Sections) -> Result<Json<Vec<Post>>, Status> {
     let mut conn = utils::app::establish_connection();
 
