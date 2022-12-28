@@ -9,7 +9,7 @@ use crate::{
         misc::Sections,
     },
 };
-use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 use rocket::{
     http::Status,
     serde::json::{json, Json, Value},

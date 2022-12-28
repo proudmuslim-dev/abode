@@ -5,6 +5,7 @@ use crate::{
     },
     routes::utils::misc::Sections,
 };
+use chrono::NaiveDateTime;
 use diesel::{Insertable, QueryResult, RunQueryDsl, SqliteConnection};
 use serde::Serialize;
 
@@ -22,6 +23,7 @@ pub struct Post {
     pub author_id: String,
     pub excerpt: String,
     pub citation: String,
+    pub creation: NaiveDateTime,
 }
 
 #[derive(Insertable)]

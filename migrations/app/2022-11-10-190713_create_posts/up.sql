@@ -9,10 +9,11 @@ CREATE TABLE users
 
 CREATE TABLE posts
 (
-    id        TEXT UNIQUE PRIMARY KEY NOT NULL,
-    author_id TEXT                    NOT NULL,
-    excerpt   TEXT                    NOT NULL,
-    citation  TEXT                    NOT NULL,
+    id        TEXT UNIQUE PRIMARY KEY              NOT NULL,
+    author_id TEXT                                 NOT NULL,
+    excerpt   TEXT                                 NOT NULL,
+    citation  TEXT                                 NOT NULL,
+    creation  DATETIME DEFAULT (current_timestamp) NOT NULL,
     FOREIGN KEY (author_id) REFERENCES users (id)
 );
 

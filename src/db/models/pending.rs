@@ -2,6 +2,7 @@ use crate::db::{
     models::{app::NewPost, section},
     schemas::pending::{feminism, islamism, modernity, pending_posts, secularism},
 };
+use chrono::NaiveDateTime;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -11,6 +12,7 @@ pub struct PendingPost {
     pub author_id: String,
     pub excerpt: String,
     pub citation: String,
+    pub creation: NaiveDateTime,
 }
 
 impl PendingPost {

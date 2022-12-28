@@ -13,28 +13,13 @@ macro_rules! get_posts {
         paste::paste! {
             {
                 use crate::db::schemas::$db::$section::dsl::*;
+                use crate::db::schemas::$db::$posts::{dsl::$posts, id, creation};
 
-                let post_ids: Vec<String> = match $section.select(post_id).load::<String>(&mut $conn) {
-                    Ok(a) => a,
-                    Err(_) => return Err(Status::InternalServerError),
-                };
+                let post_ids: Vec<String> = $section.select(post_id).load::<String>(&mut $conn).map_err(|_| Status::InternalServerError)?;
 
-                let results: Vec<QueryResult<$post_type>> = post_ids.into_iter().map(|s| {
-                    use crate::db::schemas::$db::$posts::dsl::{$posts, id};
+                let posts_vec: Vec<$post_type> = $posts.filter(id.eq_any(post_ids)).order(creation.desc()).load(&mut $conn).map_err(|_| Status::InternalServerError)?;
 
-                    $posts.filter(id.eq(s)).first(&mut $conn)
-                }).collect();
-
-                let mut posts = vec![];
-
-                for x in results {
-                    match x {
-                        Ok(p) =>  posts.push(p),
-                        Err(_) => return Err(Status::InternalServerError)
-                    }
-                }
-
-                Ok(Json(posts))
+                Ok(Json(posts_vec))
             }
         }
     };
@@ -64,9 +49,8 @@ macro_rules! get_user_posts {
     ($db:ident, $posts:ident { $post_type:ty }, $sec:ident, $conn:ident, $uid:ident) => {
         paste::paste! {
             {
-                use crate::db::schemas::$db::$posts::{author_id, dsl::$posts, id};
+                use crate::db::schemas::$db::$posts::{author_id, dsl::$posts, id, creation};
                 use crate::routes::utils::misc::Sections;
-                use diesel::result::Error as DieselError;
 
                 let matches: Vec<String>;
 
@@ -81,23 +65,11 @@ macro_rules! get_user_posts {
                     Feminism => feminism
                 );
 
-                let mut user_posts: Vec<$post_type> = vec![];
-
-                // I typically prefer using for_each but the closure interferes with the error
-                // propagation here.
-                for s in matches.into_iter() {
-                    match $posts
-                        // It's more efficient to filter by author id in most cases, as most users will have less posts than the
-                        // section in question
-                        .filter(author_id.eq($uid.clone()))
-                        .filter(id.eq(s))
-                        .first::<$post_type>($conn)
-                    {
-                        Ok(post) => user_posts.push(post),
-                        Err(DieselError::NotFound) => {},
-                        Err(e) => return Err(e),
-                    }
-                }
+                let user_posts: Vec<$post_type> = $posts
+                    .filter(author_id.eq($uid.clone()))
+                    .filter(id.eq_any(matches))
+                    .order(creation.desc())
+                    .load($conn)?;
 
                 user_posts
             }
@@ -132,6 +104,7 @@ pub(crate) use get_user_posts;
 mod tests {
     use super::{models::pending::PendingPost, *};
     use crate::routes::utils::misc::Sections;
+    use chrono::NaiveDateTime;
     use color_eyre::eyre::{Context, ContextCompat};
     use std::error::Error;
     use uuid::Uuid;
@@ -156,11 +129,13 @@ mod tests {
 
         // pid would be too confusing lol
         let pending_post_id = Uuid::new_v4();
-        let post = PendingPost {
+        // TODO: Fix this
+        let mut post = PendingPost {
             id: pending_post_id.to_string(),
             author_id: uid.to_string(),
             excerpt: excerpt.clone(),
             citation: citation.clone(),
+            creation: NaiveDateTime::default(),
         };
         let section = Sections::Islamism;
 
@@ -182,6 +157,7 @@ mod tests {
         assert_eq!(matches[0].citation.as_str(), citation.as_str());
 
         let _post = utils::pending::get_and_remove_pending_post(&mut conn, section, pending_post_id.to_string())?;
+        post.creation = _post.creation;
 
         assert_eq!(post, _post);
 

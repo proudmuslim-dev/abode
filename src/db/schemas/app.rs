@@ -24,6 +24,7 @@ diesel::table! {
         author_id -> Text,
         excerpt -> Text,
         citation -> Text,
+        creation -> Timestamp,
     }
 }
 
