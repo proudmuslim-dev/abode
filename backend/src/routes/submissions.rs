@@ -10,6 +10,7 @@ use crate::{
         misc::UuidField,
     },
 };
+use crate::routes::utils::misc::PaginationFields;
 use ammonia::clean;
 use pulldown_cmark::{html, Parser};
 use rocket::{
@@ -44,15 +45,16 @@ pub async fn get_submission(
 }
 
 // TODO: Route for username instead of UUID
-#[get("/sections/<section>/pending?<author>", rank = 2)]
+#[get("/sections/<section>/pending?<author>&<pagination..>", rank = 2)]
 pub async fn get_author_submissions(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
     author: UuidField,
+    pagination: PaginationFields,
 ) -> Result<Json<Vec<pending_post::Data>>, Status> {
     let _c = auth_header.verify()?;
 
-    let posts = get_user_pending_posts_in_section(section, author.to_string())
+    let posts = get_user_pending_posts_in_section(section, author.to_string(), pagination)
         .await
         .map_err(|_| Status::InternalServerError)?;
 

@@ -8,7 +8,7 @@ use crate::{
         submissions::PostConfirmation,
         utils::{
             headers::{AuthHeader, AuthLevel, Verifiable},
-            misc::UuidField,
+            misc::{PaginationFields, UuidField},
         },
     },
 };
@@ -31,9 +31,13 @@ pub async fn get_post(section: Category, id: UuidField) -> Result<Json<post::Dat
     }
 }
 
-#[get("/sections/<section>?<author>", rank = 2)]
-pub async fn get_author_posts(section: Category, author: UuidField) -> Result<Json<Vec<post::Data>>, Status> {
-    let posts = get_user_posts_in_section(section, author.to_string())
+#[get("/sections/<section>?<author>&<pagination..>", rank = 2)]
+pub async fn get_author_posts(
+    section: Category,
+    author: UuidField,
+    pagination: PaginationFields,
+) -> Result<Json<Vec<post::Data>>, Status> {
+    let posts = get_user_posts_in_section(section, author.to_string(), pagination)
         .await
         .map_err(|_| Status::InternalServerError)?;
 

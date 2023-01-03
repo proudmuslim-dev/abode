@@ -1,3 +1,6 @@
+// Needed because of the default attrs on FromForm
+#![allow(clippy::needless_late_init)]
+
 use rocket::form::{Form, FromFormField, Strict, ValueField};
 use sanitizer::Sanitize;
 use std::{ops::Deref, str::FromStr};
@@ -27,6 +30,26 @@ impl<'v> FromFormField<'v> for UuidField {
         let id = Uuid::from_str(val.as_str()).map_err(|_| rocket::form::Error::validation("invalid uuid"))?;
 
         Ok(UuidField(id))
+    }
+}
+
+#[derive(FromForm, Copy, Clone)]
+pub struct PaginationFields {
+    #[field(default = 1)]
+    pub page: u32,
+    #[field(default = 10)]
+    pub per_page: u32,
+}
+
+impl PaginationFields {
+    pub fn skip(&self) -> i64 {
+        if self.page == 1 {
+            0
+        } else {
+            let ret = (self.page - 1) * self.per_page;
+
+            ret.into()
+        }
     }
 }
 

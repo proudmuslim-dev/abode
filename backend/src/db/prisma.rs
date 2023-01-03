@@ -4374,8 +4374,8 @@ pub mod _prisma {
         }
     }
     pub mod read_filters {
-        use crate::db::prisma::{Category, NotificationType, Role};
         use super::*;
+        use crate::db::prisma::{Category, NotificationType, Role};
         #[derive(Clone)]
         pub enum StringFilter {
             InVec(Vec<String>),

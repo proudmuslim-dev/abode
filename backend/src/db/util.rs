@@ -7,7 +7,7 @@ use crate::{
             Category, PrismaClient,
         },
     },
-    routes::utils::jwt::generate_api_token,
+    routes::utils::{jwt::generate_api_token, misc::PaginationFields},
 };
 use async_once::AsyncOnce;
 use chrono::DateTime;
@@ -32,6 +32,24 @@ pub async fn posts<'a>() -> post::Actions<'a> {
 
 pub async fn pending_posts<'a>() -> pending_post::Actions<'a> {
     PRISMA_CLIENT.get().await.pending_post()
+}
+
+macro_rules! find_in_posts {
+    ($posts:ident, $pagination:ident, $($filter:expr),*) => {
+        paste::paste! {
+            $posts()
+                .await
+                .find_many(vec![
+                    $(
+                        $filter,
+                    )*
+                ])
+                .skip($pagination.skip())
+                .take($pagination.per_page.into())
+                .exec()
+                .await
+        }
+    }
 }
 
 pub async fn create_user(id: Uuid, username: String, password: String) -> Result<String, Box<dyn std::error::Error>> {
@@ -99,31 +117,33 @@ pub async fn get_post(category: Category, id: String) -> Result<Option<post::Dat
         .await
 }
 
-pub async fn get_section_posts(category: Category) -> Result<Vec<post::Data>, QueryError> {
-    posts()
-        .await
-        .find_many(vec![post::category::equals(category)])
-        .exec()
-        .await
+pub async fn get_section_posts(category: Category, pagination: PaginationFields) -> Result<Vec<post::Data>, QueryError> {
+    find_in_posts!(
+        posts,
+        pagination,
+        post::category::equals(category)
+    )
 }
 
-pub async fn get_user_posts(author_id: String) -> Result<Vec<post::Data>, QueryError> {
-    posts()
-        .await
-        .find_many(vec![post::author_id::equals(author_id)])
-        .exec()
-        .await
+pub async fn get_user_posts(author_id: String, pagination: PaginationFields) -> Result<Vec<post::Data>, QueryError> {
+    find_in_posts!(
+        posts,
+        pagination,
+        post::author_id::equals(author_id)
+    )
 }
 
-pub async fn get_user_posts_in_section(category: Category, author_id: String) -> Result<Vec<post::Data>, QueryError> {
-    posts()
-        .await
-        .find_many(vec![
-            post::category::equals(category),
-            post::author_id::equals(author_id),
-        ])
-        .exec()
-        .await
+pub async fn get_user_posts_in_section(
+    category: Category,
+    author_id: String,
+    pagination: PaginationFields,
+) -> Result<Vec<post::Data>, QueryError> {
+    find_in_posts!(
+        posts,
+        pagination,
+        post::category::equals(category),
+        post::author_id::equals(author_id)
+    )
 }
 
 pub async fn remove_post(category: Category, id: String) -> Result<i64, QueryError> {
@@ -167,34 +187,20 @@ pub async fn get_pending_post(category: Category, id: String) -> Result<Option<p
         .await
 }
 
-pub async fn get_section_pending_posts(category: Category) -> Result<Vec<pending_post::Data>, QueryError> {
-    pending_posts()
-        .await
-        .find_many(vec![pending_post::category::equals(category)])
-        .exec()
-        .await
+pub async fn get_section_pending_posts(category: Category, pagination: PaginationFields) -> Result<Vec<pending_post::Data>, QueryError> {
+    find_in_posts!(pending_posts, pagination, pending_post::category::equals(category))
 }
 
-pub async fn get_user_pending_posts(author_id: String) -> Result<Vec<pending_post::Data>, QueryError> {
-    pending_posts()
-        .await
-        .find_many(vec![pending_post::author_id::equals(author_id)])
-        .exec()
-        .await
+pub async fn get_user_pending_posts(author_id: String, pagination: PaginationFields) -> Result<Vec<pending_post::Data>, QueryError> {
+    find_in_posts!(pending_posts, pagination, pending_post::author_id::equals(author_id))
 }
 
 pub async fn get_user_pending_posts_in_section(
     category: Category,
     author_id: String,
+    pagination: PaginationFields,
 ) -> Result<Vec<pending_post::Data>, QueryError> {
-    pending_posts()
-        .await
-        .find_many(vec![
-            pending_post::category::equals(category),
-            pending_post::author_id::equals(author_id),
-        ])
-        .exec()
-        .await
+    find_in_posts!(pending_posts, pagination, pending_post::category::equals(category), pending_post::author_id::equals(author_id))
 }
 
 pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, QueryError> {
