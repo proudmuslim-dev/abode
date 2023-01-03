@@ -9,12 +9,13 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  role        Role          @default(USER)
-  username    String        @unique
-  password    String
-  Post        Post[]
-  PendingPost PendingPost[]
+  id            String         @id @default(uuid())
+  role          Role           @default(USER)
+  username      String         @unique
+  password      String
+  posts         Post[]
+  pendingPosts  PendingPost[]
+  notifications Notification[]
 }
 
 enum Role {
@@ -23,10 +24,10 @@ enum Role {
 }
 
 model Post {
-  id          String       @id @default(uuid())
-  submittedAt DateTime     @default(now())
-  confirmedAt DateTime     @default(now())
-  author      User         @relation(fields: [authorId], references: [id])
+  id          String   @id @default(uuid())
+  submittedAt DateTime @default(now())
+  confirmedAt DateTime @default(now())
+  author      User     @relation(fields: [authorId], references: [id])
   authorId    String
   category    Category
   excerpt     String
@@ -34,9 +35,9 @@ model Post {
 }
 
 model PendingPost {
-  id          String       @id @default(uuid())
-  submittedAt DateTime     @default(now())
-  author      User         @relation(fields: [authorId], references: [id])
+  id          String   @id @default(uuid())
+  submittedAt DateTime @default(now())
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
   category    Category
   excerpt     String
@@ -48,4 +49,17 @@ enum Category {
   MODERNITY
   SECULARISM
   FEMINISM
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId String
+  nType       NotificationType
+  content     String
+}
+
+enum NotificationType {
+  APPROVAL
+  REJECTION
 }
