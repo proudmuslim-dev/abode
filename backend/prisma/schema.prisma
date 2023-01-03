@@ -1,0 +1,51 @@
+generator client {
+  provider = "cargo prisma"
+  output   = "../src/db/prisma.rs"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:1@localhost:3306/abode_testing"
+}
+
+model User {
+  id          String        @id @default(uuid())
+  role        Role          @default(USER)
+  username    String        @unique
+  password    String
+  Post        Post[]
+  PendingPost PendingPost[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Post {
+  id          String       @id @default(uuid())
+  submittedAt DateTime     @default(now())
+  confirmedAt DateTime     @default(now())
+  author      User         @relation(fields: [authorId], references: [id])
+  authorId    String
+  category    Category
+  excerpt     String
+  citation    String
+}
+
+model PendingPost {
+  id          String       @id @default(uuid())
+  submittedAt DateTime     @default(now())
+  author      User         @relation(fields: [authorId], references: [id])
+  authorId    String
+  category    Category
+  excerpt     String
+  citation    String
+}
+
+enum Category {
+  ISLAMISM
+  MODERNITY
+  SECULARISM
+  FEMINISM
+}
