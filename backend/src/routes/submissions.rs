@@ -2,7 +2,8 @@ use crate::{
     db::{
         prisma::{pending_post, post, Category},
         util::{
-            create_pending_post, create_post, get_pending_post, get_user_pending_posts_in_section, remove_pending_post,
+            create_pending_post, create_post, get_pending_post, get_section_pending_posts, get_user_pending_posts,
+            get_user_pending_posts_in_section, remove_pending_post,
         },
     },
     routes::utils::{
@@ -24,7 +25,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
-#[get("/sections/<section>/pending?<id>", rank = 1)]
+#[get("/submissions/<section>?<id>", rank = 1)]
 pub async fn get_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
@@ -43,9 +44,38 @@ pub async fn get_submission(
     }
 }
 
-// TODO: Route for username instead of UUID
-#[get("/sections/<section>/pending?<author>&<pagination..>", rank = 2)]
+#[get("/submissions/<section>?<pagination..>")]
+pub async fn get_section_submissions(
+    auth_header: AuthHeader<{ AuthLevel::Admin }>,
+    section: Category,
+    pagination: PaginationFields,
+) -> Result<Json<Vec<pending_post::Data>>, Status> {
+    let _c = auth_header.verify()?;
+
+    Ok(Json(
+        get_section_pending_posts(section, pagination)
+            .await
+            .map_err(|_| Status::InternalServerError)?,
+    ))
+}
+
+#[get("/submissions?<author>&<pagination..>")]
 pub async fn get_author_submissions(
+    auth_header: AuthHeader<{ AuthLevel::Admin }>,
+    author: UuidField,
+    pagination: PaginationFields,
+) -> Result<Json<Vec<pending_post::Data>>, Status> {
+    let _c = auth_header.verify()?;
+
+    let posts = get_user_pending_posts(author.to_string(), pagination)
+        .await
+        .map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(posts))
+}
+
+#[get("/submissions/<section>?<author>&<pagination..>", rank = 2)]
+pub async fn get_author_section_submissions(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
     author: UuidField,
@@ -61,7 +91,7 @@ pub async fn get_author_submissions(
 }
 
 /// Returns the new post's [`Uuid`]
-#[post("/sections/<section>/submit", data = "<post>")]
+#[post("/submissions/<section>/submit", data = "<post>")]
 pub async fn new_submission(
     auth_header: AuthHeader,
     section: Category,
@@ -80,7 +110,7 @@ pub async fn new_submission(
     Ok(PostSubmissionResponse { id: id.to_string() })
 }
 
-#[post("/sections/<section>/confirm", data = "<post>")]
+#[post("/submissions/<section>/confirm", data = "<post>")]
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
@@ -123,7 +153,7 @@ pub async fn confirm_submission(
 }
 
 // TODO: Work out system for notifying user of rejection
-#[delete("/sections/<section>/reject", data = "<post>")]
+#[delete("/submissions/<section>/reject", data = "<post>")]
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,

@@ -2,7 +2,7 @@ use crate::{
     db,
     db::{
         prisma::{post, Category},
-        util::{get_user_posts_in_section, remove_post},
+        util::{get_user_posts, get_user_posts_in_section, remove_post},
     },
     routes::{
         submissions::PostConfirmation,
@@ -18,7 +18,7 @@ use rocket::{
     serde::json::{json, Json, Value},
 };
 
-#[get("/sections/<section>?<id>", rank = 1)]
+#[get("/posts/<section>?<id>", rank = 1)]
 pub async fn get_post(section: Category, id: UuidField) -> Result<Json<post::Data>, Status> {
     let post = db::util::get_post(section, id.to_string())
         .await
@@ -31,8 +31,32 @@ pub async fn get_post(section: Category, id: UuidField) -> Result<Json<post::Dat
     }
 }
 
-#[get("/sections/<section>?<author>&<pagination..>", rank = 2)]
+#[get("/posts/<section>?<pagination..>", rank = 3)]
+pub async fn get_section_posts(
+    section: Category,
+    pagination: PaginationFields,
+) -> Result<Json<Vec<post::Data>>, Status> {
+    Ok(Json(
+        db::util::get_section_posts(section, pagination)
+            .await
+            .map_err(|_| Status::InternalServerError)?,
+    ))
+}
+
+#[get("/posts?<author>&<pagination..>")]
 pub async fn get_author_posts(
+    author: UuidField,
+    pagination: PaginationFields,
+) -> Result<Json<Vec<post::Data>>, Status> {
+    let posts = get_user_posts(author.to_string(), pagination)
+        .await
+        .map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(posts))
+}
+
+#[get("/posts/<section>?<author>&<pagination..>", rank = 2)]
+pub async fn get_author_section_posts(
     section: Category,
     author: UuidField,
     pagination: PaginationFields,
@@ -44,7 +68,7 @@ pub async fn get_author_posts(
     Ok(Json(posts))
 }
 
-#[delete("/sections/<section>", data = "<post>")]
+#[delete("/posts/<section>", data = "<post>")]
 pub async fn delete_post(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
