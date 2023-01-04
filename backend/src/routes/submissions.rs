@@ -7,10 +7,9 @@ use crate::{
     },
     routes::utils::{
         headers::{AuthHeader, AuthLevel, Verifiable},
-        misc::UuidField,
+        misc::{PaginationFields, UuidField},
     },
 };
-use crate::routes::utils::misc::PaginationFields;
 use ammonia::clean;
 use pulldown_cmark::{html, Parser};
 use rocket::{

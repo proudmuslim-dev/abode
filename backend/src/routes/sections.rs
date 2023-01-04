@@ -3,23 +3,19 @@ use crate::{
         prisma::{pending_post, post, Category},
         util::{get_section_pending_posts, get_section_posts},
     },
-    routes::utils::headers::{AuthHeader, AuthLevel, Verifiable},
+    routes::utils::{
+        headers::{AuthHeader, AuthLevel, Verifiable},
+        misc::PaginationFields,
+    },
 };
 use rocket::{
     http::Status,
     serde::json::{json, Json, Value},
 };
-use crate::routes::utils::misc::PaginationFields;
 
 #[get("/sections")]
 pub async fn sections() -> Value {
-    // TODO: Move this list to an impl block
-    json!([
-        Category::Islamism,
-        Category::Modernity,
-        Category::Secularism,
-        Category::Feminism
-    ])
+    json!(Category::ALL)
 }
 
 #[get("/sections/<section>?<pagination..>", rank = 3)]

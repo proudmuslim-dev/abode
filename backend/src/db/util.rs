@@ -13,7 +13,7 @@ use async_once::AsyncOnce;
 use chrono::DateTime;
 use color_eyre::eyre::Context;
 use lazy_static::lazy_static;
-use prisma_client_rust::QueryError;
+use prisma_client_rust::{Direction, QueryError};
 use rocket::request::FromParam;
 use uuid::Uuid;
 
@@ -35,21 +35,28 @@ pub async fn pending_posts<'a>() -> pending_post::Actions<'a> {
 }
 
 macro_rules! find_in_posts {
-    ($posts:ident, $pagination:ident, $($filter:expr),*) => {
+    (post, $pagination:ident, $($filter:expr),*) => {
+        find_in_posts!(post::confirmed_at::order(Direction::Desc), $pagination, post => $($filter),*)
+    };
+    (pending_post, $pagination:ident, $($filter:expr),*) => {
+        find_in_posts!(pending_post::submitted_at::order(Direction::Desc), $pagination, pending_post => $($filter),*)
+    };
+    ($order:expr, $pagination:ident, $post:ident => $($filter:expr),*) => {
         paste::paste! {
-            $posts()
+            [<$post s>]()
                 .await
                 .find_many(vec![
                     $(
                         $filter,
                     )*
                 ])
+                .order_by($order)
                 .skip($pagination.skip())
                 .take($pagination.per_page.into())
                 .exec()
                 .await
         }
-    }
+    };
 }
 
 pub async fn create_user(id: Uuid, username: String, password: String) -> Result<String, Box<dyn std::error::Error>> {
@@ -69,6 +76,15 @@ pub async fn get_user(username: String) -> Option<user::Data> {
         .exec()
         .await
         .unwrap()
+}
+
+impl Category {
+    pub const ALL: [Category; 4] = [
+        Category::Islamism,
+        Category::Modernity,
+        Category::Secularism,
+        Category::Feminism,
+    ];
 }
 
 impl<'a> FromParam<'a> for Category {
@@ -117,20 +133,15 @@ pub async fn get_post(category: Category, id: String) -> Result<Option<post::Dat
         .await
 }
 
-pub async fn get_section_posts(category: Category, pagination: PaginationFields) -> Result<Vec<post::Data>, QueryError> {
-    find_in_posts!(
-        posts,
-        pagination,
-        post::category::equals(category)
-    )
+pub async fn get_section_posts(
+    category: Category,
+    pagination: PaginationFields,
+) -> Result<Vec<post::Data>, QueryError> {
+    find_in_posts!(post, pagination, post::category::equals(category))
 }
 
 pub async fn get_user_posts(author_id: String, pagination: PaginationFields) -> Result<Vec<post::Data>, QueryError> {
-    find_in_posts!(
-        posts,
-        pagination,
-        post::author_id::equals(author_id)
-    )
+    find_in_posts!(post, pagination, post::author_id::equals(author_id))
 }
 
 pub async fn get_user_posts_in_section(
@@ -139,7 +150,7 @@ pub async fn get_user_posts_in_section(
     pagination: PaginationFields,
 ) -> Result<Vec<post::Data>, QueryError> {
     find_in_posts!(
-        posts,
+        post,
         pagination,
         post::category::equals(category),
         post::author_id::equals(author_id)
@@ -187,12 +198,18 @@ pub async fn get_pending_post(category: Category, id: String) -> Result<Option<p
         .await
 }
 
-pub async fn get_section_pending_posts(category: Category, pagination: PaginationFields) -> Result<Vec<pending_post::Data>, QueryError> {
-    find_in_posts!(pending_posts, pagination, pending_post::category::equals(category))
+pub async fn get_section_pending_posts(
+    category: Category,
+    pagination: PaginationFields,
+) -> Result<Vec<pending_post::Data>, QueryError> {
+    find_in_posts!(pending_post, pagination, pending_post::category::equals(category))
 }
 
-pub async fn get_user_pending_posts(author_id: String, pagination: PaginationFields) -> Result<Vec<pending_post::Data>, QueryError> {
-    find_in_posts!(pending_posts, pagination, pending_post::author_id::equals(author_id))
+pub async fn get_user_pending_posts(
+    author_id: String,
+    pagination: PaginationFields,
+) -> Result<Vec<pending_post::Data>, QueryError> {
+    find_in_posts!(pending_post, pagination, pending_post::author_id::equals(author_id))
 }
 
 pub async fn get_user_pending_posts_in_section(
@@ -200,7 +217,12 @@ pub async fn get_user_pending_posts_in_section(
     author_id: String,
     pagination: PaginationFields,
 ) -> Result<Vec<pending_post::Data>, QueryError> {
-    find_in_posts!(pending_posts, pagination, pending_post::category::equals(category), pending_post::author_id::equals(author_id))
+    find_in_posts!(
+        pending_post,
+        pagination,
+        pending_post::category::equals(category),
+        pending_post::author_id::equals(author_id)
+    )
 }
 
 pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, QueryError> {
