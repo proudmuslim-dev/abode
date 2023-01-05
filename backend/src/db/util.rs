@@ -2,9 +2,11 @@ use crate::{
     db::{
         prisma,
         prisma::{
+            notification,
+            notification::WhereParam,
             pending_post, post, user,
             user::{SetParam, UniqueWhereParam},
-            Category, PrismaClient,
+            Category, NotificationType, PrismaClient,
         },
     },
     routes::utils::{jwt::generate_api_token, misc::PaginationFields},
@@ -32,6 +34,10 @@ pub async fn posts<'a>() -> post::Actions<'a> {
 
 pub async fn pending_posts<'a>() -> pending_post::Actions<'a> {
     PRISMA_CLIENT.get().await.pending_post()
+}
+
+pub async fn notifications<'a>() -> notification::Actions<'a> {
+    PRISMA_CLIENT.get().await.notification()
 }
 
 macro_rules! find_in_posts {
@@ -76,6 +82,34 @@ pub async fn get_user(username: String) -> Option<user::Data> {
         .exec()
         .await
         .unwrap()
+}
+
+// TODO:
+pub async fn get_user_notifications(
+    user: Uuid,
+    which: WhichNotifications,
+) -> Result<Vec<notification::Data>, QueryError> {
+    let mut filters = vec![WhereParam::RecipientIdEquals(user.to_string())];
+
+    match which {
+        WhichNotifications::Read => filters.push(WhereParam::ReadEquals(true)),
+        WhichNotifications::Unread => filters.push(WhereParam::ReadEquals(false)),
+        WhichNotifications::All => {}
+    }
+
+    notifications()
+        .await
+        .find_many(filters)
+        .order_by(notification::created_at::order(Direction::Desc))
+        .exec()
+        .await
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, FromFormField)]
+pub enum WhichNotifications {
+    Read,
+    Unread,
+    All,
 }
 
 impl Category {
@@ -232,6 +266,56 @@ pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, 
             pending_post::category::equals(category),
             pending_post::id::equals(id),
         ])
+        .exec()
+        .await
+}
+
+pub async fn reject_pending_post(
+    category: Category,
+    id: String,
+    reason: String,
+) -> Result<notification::Data, QueryError> {
+    let pending_post::Data {
+        author_id: uid,
+        excerpt,
+        citation,
+        ..
+    } = match pending_posts()
+        .await
+        .find_unique(pending_post::UniqueWhereParam::IdEquals(id.clone()))
+        .exec()
+        .await?
+    {
+        Some(p) => p,
+        None => {
+            return Err(QueryError::Deserialize(serde_value::DeserializerError::Custom(
+                "Not Found".to_owned(),
+            )))
+        }
+    };
+
+    remove_pending_post(category, id.clone()).await?;
+
+    create_notification(uid, reason, excerpt, citation, NotificationType::Rejection).await
+}
+
+pub async fn create_notification(
+    uid: String,
+    reason: String,
+    excerpt: String,
+    citation: String,
+    n_type: NotificationType,
+) -> Result<notification::Data, QueryError> {
+    notifications()
+        .await
+        .create(
+            UniqueWhereParam::IdEquals(uid),
+            n_type,
+            reason,
+            excerpt,
+            citation,
+            vec![],
+        )
         .exec()
         .await
 }

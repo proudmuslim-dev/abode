@@ -1,9 +1,9 @@
 use crate::{
     db::{
-        prisma::{pending_post, post, Category},
+        prisma::{notification, pending_post, post, Category},
         util::{
             create_pending_post, create_post, get_pending_post, get_section_pending_posts, get_user_pending_posts,
-            get_user_pending_posts_in_section, remove_pending_post,
+            get_user_pending_posts_in_section, reject_pending_post, remove_pending_post,
         },
     },
     routes::utils::{
@@ -12,12 +12,13 @@ use crate::{
     },
 };
 use ammonia::clean;
+use prisma_client_rust::QueryError;
 use pulldown_cmark::{html, Parser};
 use rocket::{
     form::{Form, Strict},
     http::Status,
     response::Responder,
-    serde::json::{json, Json, Value},
+    serde::json::{Json},
     Request, Response,
 };
 use sanitizer::prelude::*;
@@ -152,27 +153,43 @@ pub async fn confirm_submission(
     Ok(Json(confirmed))
 }
 
-// TODO: Work out system for notifying user of rejection
-#[delete("/submissions/<section>/reject", data = "<post>")]
+// TODO: Notify user of approval as well
+#[delete("/submissions/<section>/reject", data = "<rejection>")]
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    post: Form<Strict<PostConfirmation>>,
-) -> Result<Value, Status> {
+    rejection: Form<Strict<PostRejection>>,
+) -> Result<Json<notification::Data>, Status> {
     let _c = auth_header.verify()?;
 
-    let id = post.id.to_string();
+    let id = rejection.submission_id.to_string();
 
-    remove_pending_post(section, id.clone())
+    let ret = reject_pending_post(section, id, rejection.reason.clone())
         .await
-        .map_err(|_| Status::InternalServerError)?;
+        .map_err(|e| match e {
+            QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
+                if err.eq("Not Found") {
+                    Status::NotFound
+                } else {
+                    Status::InternalServerError
+                }
+            }
+            _ => Status::InternalServerError,
+        })?;
 
-    Ok(json!({ "id": id }))
+    Ok(Json(ret))
 }
 
 #[derive(FromForm)]
 pub struct PostConfirmation {
     pub(crate) id: UuidField,
+}
+
+#[derive(FromForm)]
+pub struct PostRejection {
+    #[field(name = uncased("id"))]
+    pub(crate) submission_id: UuidField,
+    pub(crate) reason: String,
 }
 
 #[derive(FromForm, Deserialize, Sanitize)]

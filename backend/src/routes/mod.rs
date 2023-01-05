@@ -1,3 +1,4 @@
+pub mod notifications;
 pub mod posts;
 pub mod sections;
 pub mod sign_in;

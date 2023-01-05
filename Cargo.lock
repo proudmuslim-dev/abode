@@ -232,6 +232,7 @@ dependencies = [
  "rocket",
  "sanitizer",
  "serde",
+ "serde-value",
  "strum",
  "tokio",
  "uuid 1.2.2",

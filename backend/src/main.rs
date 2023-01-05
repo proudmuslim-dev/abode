@@ -2,6 +2,7 @@
 extern crate rocket;
 
 use backend::routes::{
+    notifications::get_notifications,
     posts::{delete_post, get_author_posts, get_author_section_posts, get_post, get_section_posts},
     sections::sections,
     sign_in::sign_in,
@@ -25,6 +26,7 @@ async fn rocket() -> _ {
             hello,
             sign_in,
             sign_up,
+            get_notifications,
             sections,
             get_section_posts,
             get_author_posts,
