@@ -18,7 +18,7 @@ use rocket::{
     form::{Form, Strict},
     http::Status,
     response::Responder,
-    serde::json::{Json},
+    serde::json::Json,
     Request, Response,
 };
 use sanitizer::prelude::*;
@@ -111,6 +111,7 @@ pub async fn new_submission(
     Ok(PostSubmissionResponse { id: id.to_string() })
 }
 
+// TODO: Notify user of approval
 #[post("/submissions/<section>/confirm", data = "<post>")]
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
@@ -153,7 +154,6 @@ pub async fn confirm_submission(
     Ok(Json(confirmed))
 }
 
-// TODO: Notify user of approval as well
 #[delete("/submissions/<section>/reject", data = "<rejection>")]
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
@@ -164,7 +164,7 @@ pub async fn reject_submission(
 
     let id = rejection.submission_id.to_string();
 
-    let ret = reject_pending_post(section, id, rejection.reason.clone())
+    let ret = reject_pending_post(section, id, rejection.comment.clone())
         .await
         .map_err(|e| match e {
             QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
@@ -177,6 +177,7 @@ pub async fn reject_submission(
             _ => Status::InternalServerError,
         })?;
 
+    // TODO: Serialize the notification content as well
     Ok(Json(ret))
 }
 
@@ -189,7 +190,7 @@ pub struct PostConfirmation {
 pub struct PostRejection {
     #[field(name = uncased("id"))]
     pub(crate) submission_id: UuidField,
-    pub(crate) reason: String,
+    pub(crate) comment: Option<String>,
 }
 
 #[derive(FromForm, Deserialize, Sanitize)]

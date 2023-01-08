@@ -13,5 +13,8 @@
 #[macro_use]
 extern crate rocket;
 
+#[macro_use]
+extern crate serde;
+
 pub mod db;
 pub mod routes;

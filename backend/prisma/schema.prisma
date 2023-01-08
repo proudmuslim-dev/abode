@@ -51,6 +51,12 @@ enum Category {
   FEMINISM
 }
 
+/// * Notif ID
+/// * Timestamp
+/// * recipientID
+/// * read (bool)
+/// * notificationType
+/// * content - String, serialize to enum
 model Notification {
   id          String           @id @default(uuid())
   createdAt   DateTime         @default(now())
@@ -58,10 +64,7 @@ model Notification {
   recipientId String
   read        Boolean          @default(false)
   nType       NotificationType
-  // TODO: Make nullable + rename to comment
-  reason      String
-  excerpt     String
-  citation    String
+  content     String
 }
 
 enum NotificationType {

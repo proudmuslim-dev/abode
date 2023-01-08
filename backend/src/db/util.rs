@@ -84,7 +84,6 @@ pub async fn get_user(username: String) -> Option<user::Data> {
         .unwrap()
 }
 
-// TODO:
 pub async fn get_user_notifications(
     user: Uuid,
     which: WhichNotifications,
@@ -273,7 +272,7 @@ pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, 
 pub async fn reject_pending_post(
     category: Category,
     id: String,
-    reason: String,
+    comment: Option<String>,
 ) -> Result<notification::Data, QueryError> {
     let pending_post::Data {
         author_id: uid,
@@ -296,26 +295,44 @@ pub async fn reject_pending_post(
 
     remove_pending_post(category, id.clone()).await?;
 
-    create_notification(uid, reason, excerpt, citation, NotificationType::Rejection).await
+    let notif = Notification::PostRejection {
+        comment,
+        excerpt,
+        citation,
+    };
+
+    create_notification(uid, &notif).await
 }
 
-pub async fn create_notification(
-    uid: String,
-    reason: String,
-    excerpt: String,
-    citation: String,
-    n_type: NotificationType,
-) -> Result<notification::Data, QueryError> {
+pub async fn create_notification(uid: String, notif: &Notification) -> Result<notification::Data, QueryError> {
+    let content = serde_json::to_string(notif).unwrap();
+
     notifications()
         .await
-        .create(
-            UniqueWhereParam::IdEquals(uid),
-            n_type,
-            reason,
-            excerpt,
-            citation,
-            vec![],
-        )
+        .create(UniqueWhereParam::IdEquals(uid), notif.enum_type(), content, vec![])
         .exec()
         .await
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum Notification {
+    PostApproval {
+        url: String,
+        comment: Option<String>,
+    },
+    PostRejection {
+        comment: Option<String>,
+        excerpt: String,
+        citation: String,
+    },
+}
+
+impl Notification {
+    pub fn enum_type(&self) -> NotificationType {
+        match self {
+            Notification::PostApproval { .. } => NotificationType::Approval,
+            Notification::PostRejection { .. } => NotificationType::Rejection,
+        }
+    }
 }

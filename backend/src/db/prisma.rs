@@ -3782,245 +3782,94 @@ pub mod notification {
             }
         }
     }
-    pub mod reason {
+    pub mod content {
         use super::{super::*, OrderByParam, SetParam, UniqueWhereParam, WhereParam, WithParam, _prisma::*};
         pub fn set<T: From<Set>>(value: String) -> T {
             Set(value).into()
         }
         pub fn equals(value: String) -> WhereParam {
-            WhereParam::ReasonEquals(value).into()
+            WhereParam::ContentEquals(value).into()
         }
         pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Reason(direction)
+            OrderByParam::Content(direction)
         }
         pub fn in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::InVec(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::InVec(value))
         }
         pub fn not_in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::NotInVec(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::NotInVec(value))
         }
         pub fn lt(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Lt(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Lt(value))
         }
         pub fn lte(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Lte(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Lte(value))
         }
         pub fn gt(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Gt(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Gt(value))
         }
         pub fn gte(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Gte(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Gte(value))
         }
         pub fn contains(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Contains(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Contains(value))
         }
         pub fn starts_with(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::StartsWith(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::StartsWith(value))
         }
         pub fn ends_with(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::EndsWith(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::EndsWith(value))
         }
         pub fn not(value: String) -> WhereParam {
-            WhereParam::Reason(_prisma::read_filters::StringFilter::Not(value))
+            WhereParam::Content(_prisma::read_filters::StringFilter::Not(value))
         }
         pub struct Set(pub String);
         impl From<Set> for SetParam {
             fn from(value: Set) -> Self {
-                Self::SetReason(value.0)
+                Self::SetContent(value.0)
             }
         }
         pub struct Include;
         impl Into<super::IncludeParam> for Include {
             fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Reason(self)
+                super::IncludeParam::Content(self)
             }
         }
         impl Include {
             pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("reason").build()
+                ::prisma_client_rust::Selection::builder("content").build()
             }
         }
         pub struct Select;
         impl Into<super::SelectParam> for Select {
             fn into(self) -> super::SelectParam {
-                super::SelectParam::Reason(self)
+                super::SelectParam::Content(self)
             }
         }
         impl Select {
             pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("reason").build()
-            }
-        }
-    }
-    pub mod excerpt {
-        use super::{super::*, OrderByParam, SetParam, UniqueWhereParam, WhereParam, WithParam, _prisma::*};
-        pub fn set<T: From<Set>>(value: String) -> T {
-            Set(value).into()
-        }
-        pub fn equals(value: String) -> WhereParam {
-            WhereParam::ExcerptEquals(value).into()
-        }
-        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Excerpt(direction)
-        }
-        pub fn in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::InVec(value))
-        }
-        pub fn not_in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::NotInVec(value))
-        }
-        pub fn lt(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Lt(value))
-        }
-        pub fn lte(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Lte(value))
-        }
-        pub fn gt(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Gt(value))
-        }
-        pub fn gte(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Gte(value))
-        }
-        pub fn contains(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Contains(value))
-        }
-        pub fn starts_with(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::StartsWith(value))
-        }
-        pub fn ends_with(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::EndsWith(value))
-        }
-        pub fn not(value: String) -> WhereParam {
-            WhereParam::Excerpt(_prisma::read_filters::StringFilter::Not(value))
-        }
-        pub struct Set(pub String);
-        impl From<Set> for SetParam {
-            fn from(value: Set) -> Self {
-                Self::SetExcerpt(value.0)
-            }
-        }
-        pub struct Include;
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Excerpt(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("excerpt").build()
-            }
-        }
-        pub struct Select;
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::Excerpt(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("excerpt").build()
-            }
-        }
-    }
-    pub mod citation {
-        use super::{super::*, OrderByParam, SetParam, UniqueWhereParam, WhereParam, WithParam, _prisma::*};
-        pub fn set<T: From<Set>>(value: String) -> T {
-            Set(value).into()
-        }
-        pub fn equals(value: String) -> WhereParam {
-            WhereParam::CitationEquals(value).into()
-        }
-        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Citation(direction)
-        }
-        pub fn in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::InVec(value))
-        }
-        pub fn not_in_vec(value: Vec<String>) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::NotInVec(value))
-        }
-        pub fn lt(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Lt(value))
-        }
-        pub fn lte(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Lte(value))
-        }
-        pub fn gt(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Gt(value))
-        }
-        pub fn gte(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Gte(value))
-        }
-        pub fn contains(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Contains(value))
-        }
-        pub fn starts_with(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::StartsWith(value))
-        }
-        pub fn ends_with(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::EndsWith(value))
-        }
-        pub fn not(value: String) -> WhereParam {
-            WhereParam::Citation(_prisma::read_filters::StringFilter::Not(value))
-        }
-        pub struct Set(pub String);
-        impl From<Set> for SetParam {
-            fn from(value: Set) -> Self {
-                Self::SetCitation(value.0)
-            }
-        }
-        pub struct Include;
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Citation(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("citation").build()
-            }
-        }
-        pub struct Select;
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::Citation(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::Selection::builder("citation").build()
+                ::prisma_client_rust::Selection::builder("content").build()
             }
         }
     }
     pub fn create(
         recipient: super::user::UniqueWhereParam,
         n_type: NotificationType,
-        reason: String,
-        excerpt: String,
-        citation: String,
+        content: String,
         _params: Vec<SetParam>,
-    ) -> (
-        super::user::UniqueWhereParam,
-        NotificationType,
-        String,
-        String,
-        String,
-        Vec<SetParam>,
-    ) {
-        (recipient, n_type, reason, excerpt, citation, _params)
+    ) -> (super::user::UniqueWhereParam, NotificationType, String, Vec<SetParam>) {
+        (recipient, n_type, content, _params)
     }
     pub fn create_unchecked(
         recipient_id: String,
         n_type: NotificationType,
-        reason: String,
-        excerpt: String,
-        citation: String,
+        content: String,
         _params: Vec<SetParam>,
-    ) -> (String, NotificationType, String, String, String, Vec<SetParam>) {
-        (recipient_id, n_type, reason, excerpt, citation, _params)
+    ) -> (String, NotificationType, String, Vec<SetParam>) {
+        (recipient_id, n_type, content, _params)
     }
     #[macro_export]
-    macro_rules ! _select_notification { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { $ crate :: prisma :: notification :: select ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Select (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: select :: SelectType for Select { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } use super :: * ; pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Select { Select ($ crate :: prisma :: notification :: select ! (@ selections_to_select_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { $ crate :: prisma :: notification :: select ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Select (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: select :: SelectType for Select { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Select ($ crate :: prisma :: notification :: select ! (@ selections_to_select_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect ()) } } ; (@ definitions ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , created_at , recipient , recipient_id , read , n_type , reason , excerpt , citation } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : $ crate :: prisma :: notification :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (concat ! ($ ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) , ", ") , +)) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field))) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field))) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "createdAt" , "recipient" , "recipientId" , "read" , "nType" , "reason" , "excerpt" , "citation"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { $ crate :: prisma :: notification :: select ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; created_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { recipient :: Data } ; (@ field_type ; recipient) => { crate :: prisma :: user :: Data } ; (@ field_type ; recipient_id) => { String } ; (@ field_type ; read) => { bool } ; (@ field_type ; n_type) => { NotificationType } ; (@ field_type ; reason) => { String } ; (@ field_type ; excerpt) => { String } ; (@ field_type ; citation) => { String } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot select field nonexistent field $ field on model "Notification" , available fields are "id, created_at, recipient, recipient_id, read, n_type, reason, excerpt, citation")) } ; (@ field_module ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { $ crate :: prisma :: user :: select ! (@ definitions ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: id :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: created_at :: Select) } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient :: Select :: $ selection_mode ($ crate :: prisma :: user :: select ! (@ selections_to_select_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; recipient_id) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient_id :: Select) } ; (@ selection_field_to_selection_param ; read) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: read :: Select) } ; (@ selection_field_to_selection_param ; n_type) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: n_type :: Select) } ; (@ selection_field_to_selection_param ; reason) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: reason :: Select) } ; (@ selection_field_to_selection_param ; excerpt) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: excerpt :: Select) } ; (@ selection_field_to_selection_param ; citation) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: citation :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_select_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ ($ crate :: prisma :: notification :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; created_at) => { "createdAt" } ; (@ field_serde_name ; recipient) => { "recipient" } ; (@ field_serde_name ; recipient_id) => { "recipientId" } ; (@ field_serde_name ; read) => { "read" } ; (@ field_serde_name ; n_type) => { "nType" } ; (@ field_serde_name ; reason) => { "reason" } ; (@ field_serde_name ; excerpt) => { "excerpt" } ; (@ field_serde_name ; citation) => { "citation" } ; }
+    macro_rules ! _select_notification { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { $ crate :: prisma :: notification :: select ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Select (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: select :: SelectType for Select { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } use super :: * ; pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Select { Select ($ crate :: prisma :: notification :: select ! (@ selections_to_select_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { $ crate :: prisma :: notification :: select ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Select (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: select :: SelectType for Select { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Select ($ crate :: prisma :: notification :: select ! (@ selections_to_select_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect ()) } } ; (@ definitions ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , created_at , recipient , recipient_id , read , n_type , content } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : $ crate :: prisma :: notification :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (concat ! ($ ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) , ", ") , +)) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field) => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field))) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: select ! (@ field_serde_name ; $ field))) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "createdAt" , "recipient" , "recipientId" , "read" , "nType" , "content"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { $ crate :: prisma :: notification :: select ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; created_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { recipient :: Data } ; (@ field_type ; recipient) => { crate :: prisma :: user :: Data } ; (@ field_type ; recipient_id) => { String } ; (@ field_type ; read) => { bool } ; (@ field_type ; n_type) => { NotificationType } ; (@ field_type ; content) => { String } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot select field nonexistent field $ field on model "Notification" , available fields are "id, created_at, recipient, recipient_id, read, n_type, content")) } ; (@ field_module ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { $ crate :: prisma :: user :: select ! (@ definitions ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: id :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: created_at :: Select) } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient :: Select :: $ selection_mode ($ crate :: prisma :: user :: select ! (@ selections_to_select_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; recipient_id) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: recipient_id :: Select) } ; (@ selection_field_to_selection_param ; read) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: read :: Select) } ; (@ selection_field_to_selection_param ; n_type) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: n_type :: Select) } ; (@ selection_field_to_selection_param ; content) => { Into :: < $ crate :: prisma :: notification :: SelectParam > :: into ($ crate :: prisma :: notification :: content :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_select_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ ($ crate :: prisma :: notification :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; created_at) => { "createdAt" } ; (@ field_serde_name ; recipient) => { "recipient" } ; (@ field_serde_name ; recipient_id) => { "recipientId" } ; (@ field_serde_name ; read) => { "read" } ; (@ field_serde_name ; n_type) => { "nType" } ; (@ field_serde_name ; content) => { "content" } ; }
     pub use _select_notification as select;
     pub enum SelectParam {
         Id(id::Select),
@@ -4029,9 +3878,7 @@ pub mod notification {
         RecipientId(recipient_id::Select),
         Read(read::Select),
         NType(n_type::Select),
-        Reason(reason::Select),
-        Excerpt(excerpt::Select),
-        Citation(citation::Select),
+        Content(content::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -4042,14 +3889,12 @@ pub mod notification {
                 Self::RecipientId(data) => data.to_selection(),
                 Self::Read(data) => data.to_selection(),
                 Self::NType(data) => data.to_selection(),
-                Self::Reason(data) => data.to_selection(),
-                Self::Excerpt(data) => data.to_selection(),
-                Self::Citation(data) => data.to_selection(),
+                Self::Content(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_notification { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { $ crate :: prisma :: notification :: include ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Include (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: include :: IncludeType for Include { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } use super :: * ; pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Include { let mut selections = < $ crate :: prisma :: notification :: Actions as :: prisma_client_rust :: ModelActions > :: scalar_selections () ; selections . extend ($ crate :: prisma :: notification :: include ! (@ selections_to_include_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ())) ; Include (selections) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { $ crate :: prisma :: notification :: include ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Include (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: include :: IncludeType for Include { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Include ({ let mut selections = < $ crate :: prisma :: notification :: Actions as :: prisma_client_rust :: ModelActions > :: scalar_selections () ; selections . extend ($ crate :: prisma :: notification :: include ! (@ selections_to_include_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ())) ; selections }) } } ; (@ definitions ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { recipient } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub recipient_id : String , pub read : bool , pub n_type : NotificationType , pub reason : String , pub excerpt : String , pub citation : String , $ (pub $ field : $ crate :: prisma :: notification :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (created_at) , stringify ! (recipient_id) , stringify ! (read) , stringify ! (n_type) , stringify ! (reason) , stringify ! (excerpt) , stringify ! (citation)] . len ()) ? ; $ (state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) , & self . $ field) ? ;) * state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) , & self . id) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) , & self . created_at) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) , & self . recipient_id) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) , & self . read) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) , & self . n_type) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; reason) , & self . reason) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; excerpt) , & self . excerpt) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; citation) , & self . citation) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , created_at , recipient_id , read , n_type , reason , excerpt , citation } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (concat ! ($ ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) , ", ") , + , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; reason) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; excerpt) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; citation) , ", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) => Ok (Field :: $ field)) , * , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) => Ok (Field :: id) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) => Ok (Field :: created_at) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) => Ok (Field :: recipient_id) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) => Ok (Field :: read) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) => Ok (Field :: n_type) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; reason) => Ok (Field :: reason) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; excerpt) => Ok (Field :: excerpt) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; citation) => Ok (Field :: citation) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut created_at = None ; let mut recipient_id = None ; let mut read = None ; let mut n_type = None ; let mut reason = None ; let mut excerpt = None ; let mut citation = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id))) ; } id = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at))) ; } created_at = Some (map . next_value () ?) ; } Field :: recipient_id => { if recipient_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id))) ; } recipient_id = Some (map . next_value () ?) ; } Field :: read => { if read . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read))) ; } read = Some (map . next_value () ?) ; } Field :: n_type => { if n_type . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type))) ; } n_type = Some (map . next_value () ?) ; } Field :: reason => { if reason . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; reason))) ; } reason = Some (map . next_value () ?) ; } Field :: excerpt => { if excerpt . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; excerpt))) ; } excerpt = Some (map . next_value () ?) ; } Field :: citation => { if citation . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; citation))) ; } citation = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field))) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field))) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id))) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at))) ? ; let recipient_id = recipient_id . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id))) ? ; let read = read . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read))) ? ; let n_type = n_type . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type))) ? ; let reason = reason . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; reason))) ? ; let excerpt = excerpt . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; excerpt))) ? ; let citation = citation . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; citation))) ? ; Ok (Data { id , created_at , recipient_id , read , n_type , reason , excerpt , citation , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "createdAt" , "recipient" , "recipientId" , "read" , "nType" , "reason" , "excerpt" , "citation"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { $ crate :: prisma :: notification :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { recipient :: Data } ; (@ field_type ; recipient) => { crate :: prisma :: user :: Data } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Notification" , available relations are "recipient")) } ; (@ field_module ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { $ crate :: prisma :: user :: include ! (@ definitions ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < $ crate :: prisma :: notification :: IncludeParam > :: into ($ crate :: prisma :: notification :: recipient :: Include :: $ selection_mode ($ crate :: prisma :: user :: include ! (@ selections_to_include_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < $ crate :: prisma :: notification :: IncludeParam > :: into ($ crate :: prisma :: notification :: recipient :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_include_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ ($ crate :: prisma :: notification :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; created_at) => { "createdAt" } ; (@ field_serde_name ; recipient) => { "recipient" } ; (@ field_serde_name ; recipient_id) => { "recipientId" } ; (@ field_serde_name ; read) => { "read" } ; (@ field_serde_name ; n_type) => { "nType" } ; (@ field_serde_name ; reason) => { "reason" } ; (@ field_serde_name ; excerpt) => { "excerpt" } ; (@ field_serde_name ; citation) => { "citation" } ; }
+    macro_rules ! _include_notification { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { $ crate :: prisma :: notification :: include ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Include (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: include :: IncludeType for Include { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } use super :: * ; pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Include { let mut selections = < $ crate :: prisma :: notification :: Actions as :: prisma_client_rust :: ModelActions > :: scalar_selections () ; selections . extend ($ crate :: prisma :: notification :: include ! (@ selections_to_include_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ())) ; Include (selections) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { $ crate :: prisma :: notification :: include ! (@ definitions ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Include (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: include :: IncludeType for Include { type Data = Data ; type ModelData = $ crate :: prisma :: notification :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Include ({ let mut selections = < $ crate :: prisma :: notification :: Actions as :: prisma_client_rust :: ModelActions > :: scalar_selections () ; selections . extend ($ crate :: prisma :: notification :: include ! (@ selections_to_include_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ())) ; selections }) } } ; (@ definitions ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { recipient } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub recipient_id : String , pub read : bool , pub n_type : NotificationType , pub content : String , $ (pub $ field : $ crate :: prisma :: notification :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (created_at) , stringify ! (recipient_id) , stringify ! (read) , stringify ! (n_type) , stringify ! (content)] . len ()) ? ; $ (state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) , & self . $ field) ? ;) * state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) , & self . id) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) , & self . created_at) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) , & self . recipient_id) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) , & self . read) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) , & self . n_type) ? ; state . serialize_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; content) , & self . content) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , created_at , recipient_id , read , n_type , content } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (concat ! ($ ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) , ", ") , + , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) , ", " , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; content) , ", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field) => Ok (Field :: $ field)) , * , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; id) => Ok (Field :: id) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at) => Ok (Field :: created_at) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id) => Ok (Field :: recipient_id) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; read) => Ok (Field :: read) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type) => Ok (Field :: n_type) , $ crate :: prisma :: notification :: include ! (@ field_serde_name ; content) => Ok (Field :: content) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut created_at = None ; let mut recipient_id = None ; let mut read = None ; let mut n_type = None ; let mut content = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id))) ; } id = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at))) ; } created_at = Some (map . next_value () ?) ; } Field :: recipient_id => { if recipient_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id))) ; } recipient_id = Some (map . next_value () ?) ; } Field :: read => { if read . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read))) ; } read = Some (map . next_value () ?) ; } Field :: n_type => { if n_type . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type))) ; } n_type = Some (map . next_value () ?) ; } Field :: content => { if content . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; content))) ; } content = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field))) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; $ field))) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; id))) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; created_at))) ? ; let recipient_id = recipient_id . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; recipient_id))) ? ; let read = read . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; read))) ? ; let n_type = n_type . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; n_type))) ? ; let content = content . ok_or_else (|| serde :: de :: Error :: missing_field ($ crate :: prisma :: notification :: include ! (@ field_serde_name ; content))) ? ; Ok (Data { id , created_at , recipient_id , read , n_type , content , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "createdAt" , "recipient" , "recipientId" , "read" , "nType" , "content"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { $ crate :: prisma :: notification :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { recipient :: Data } ; (@ field_type ; recipient) => { crate :: prisma :: user :: Data } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Notification" , available relations are "recipient")) } ; (@ field_module ; recipient : $ selection_mode : ident { $ ($ selections : tt) + }) => { $ crate :: prisma :: user :: include ! (@ definitions ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < $ crate :: prisma :: notification :: IncludeParam > :: into ($ crate :: prisma :: notification :: recipient :: Include :: $ selection_mode ($ crate :: prisma :: user :: include ! (@ selections_to_include_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; recipient $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < $ crate :: prisma :: notification :: IncludeParam > :: into ($ crate :: prisma :: notification :: recipient :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_include_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ ($ crate :: prisma :: notification :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; created_at) => { "createdAt" } ; (@ field_serde_name ; recipient) => { "recipient" } ; (@ field_serde_name ; recipient_id) => { "recipientId" } ; (@ field_serde_name ; read) => { "read" } ; (@ field_serde_name ; n_type) => { "nType" } ; (@ field_serde_name ; content) => { "content" } ; }
     pub use _include_notification as include;
     pub enum IncludeParam {
         Id(id::Include),
@@ -4058,9 +3903,7 @@ pub mod notification {
         RecipientId(recipient_id::Include),
         Read(read::Include),
         NType(n_type::Include),
-        Reason(reason::Include),
-        Excerpt(excerpt::Include),
-        Citation(citation::Include),
+        Content(content::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -4071,9 +3914,7 @@ pub mod notification {
                 Self::RecipientId(data) => data.to_selection(),
                 Self::Read(data) => data.to_selection(),
                 Self::NType(data) => data.to_selection(),
-                Self::Reason(data) => data.to_selection(),
-                Self::Excerpt(data) => data.to_selection(),
-                Self::Citation(data) => data.to_selection(),
+                Self::Content(data) => data.to_selection(),
             }
         }
     }
@@ -4091,12 +3932,8 @@ pub mod notification {
         pub read: bool,
         #[serde(rename = "nType")]
         pub n_type: NotificationType,
-        #[serde(rename = "reason")]
-        pub reason: String,
-        #[serde(rename = "excerpt")]
-        pub excerpt: String,
-        #[serde(rename = "citation")]
-        pub citation: String,
+        #[serde(rename = "content")]
+        pub content: String,
     }
     impl Data {
         pub fn recipient(&self) -> Result<&super::user::Data, ::prisma_client_rust::RelationNotFetchedError> {
@@ -4138,9 +3975,7 @@ pub mod notification {
         SetRecipientId(String),
         SetRead(bool),
         SetNType(NotificationType),
-        SetReason(String),
-        SetExcerpt(String),
-        SetCitation(String),
+        SetContent(String),
     }
     impl Into<(String, ::prisma_client_rust::PrismaValue)> for SetParam {
         fn into(self) -> (String, ::prisma_client_rust::PrismaValue) {
@@ -4173,12 +4008,8 @@ pub mod notification {
                     "nType".to_string(),
                     ::prisma_client_rust::PrismaValue::Enum(value.to_string()),
                 ),
-                SetParam::SetReason(value) => ("reason".to_string(), ::prisma_client_rust::PrismaValue::String(value)),
-                SetParam::SetExcerpt(value) => {
-                    ("excerpt".to_string(), ::prisma_client_rust::PrismaValue::String(value))
-                }
-                SetParam::SetCitation(value) => {
-                    ("citation".to_string(), ::prisma_client_rust::PrismaValue::String(value))
+                SetParam::SetContent(value) => {
+                    ("content".to_string(), ::prisma_client_rust::PrismaValue::String(value))
                 }
             }
         }
@@ -4190,9 +4021,7 @@ pub mod notification {
         RecipientId(::prisma_client_rust::Direction),
         Read(::prisma_client_rust::Direction),
         NType(::prisma_client_rust::Direction),
-        Reason(::prisma_client_rust::Direction),
-        Excerpt(::prisma_client_rust::Direction),
-        Citation(::prisma_client_rust::Direction),
+        Content(::prisma_client_rust::Direction),
     }
     impl Into<(String, ::prisma_client_rust::PrismaValue)> for OrderByParam {
         fn into(self) -> (String, ::prisma_client_rust::PrismaValue) {
@@ -4217,16 +4046,8 @@ pub mod notification {
                     "nType".to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
-                Self::Reason(direction) => (
-                    "reason".to_string(),
-                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
-                ),
-                Self::Excerpt(direction) => (
-                    "excerpt".to_string(),
-                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
-                ),
-                Self::Citation(direction) => (
-                    "citation".to_string(),
+                Self::Content(direction) => (
+                    "content".to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
             }
@@ -4247,12 +4068,8 @@ pub mod notification {
         RecipientId(_prisma::read_filters::StringFilter),
         ReadEquals(bool),
         NTypeEquals(NotificationType),
-        ReasonEquals(String),
-        Reason(_prisma::read_filters::StringFilter),
-        ExcerptEquals(String),
-        Excerpt(_prisma::read_filters::StringFilter),
-        CitationEquals(String),
-        Citation(_prisma::read_filters::StringFilter),
+        ContentEquals(String),
+        Content(_prisma::read_filters::StringFilter),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -4353,30 +4170,14 @@ pub mod notification {
                         ::prisma_client_rust::PrismaValue::Enum(value.to_string()),
                     )]),
                 ),
-                Self::ReasonEquals(value) => (
-                    "reason",
+                Self::ContentEquals(value) => (
+                    "content",
                     ::prisma_client_rust::SerializedWhereValue::Object(vec![(
                         "equals".to_string(),
                         ::prisma_client_rust::PrismaValue::String(value),
                     )]),
                 ),
-                Self::Reason(value) => ("reason", value.into()),
-                Self::ExcerptEquals(value) => (
-                    "excerpt",
-                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
-                        "equals".to_string(),
-                        ::prisma_client_rust::PrismaValue::String(value),
-                    )]),
-                ),
-                Self::Excerpt(value) => ("excerpt", value.into()),
-                Self::CitationEquals(value) => (
-                    "citation",
-                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
-                        "equals".to_string(),
-                        ::prisma_client_rust::PrismaValue::String(value),
-                    )]),
-                ),
-                Self::Citation(value) => ("citation", value.into()),
+                Self::Content(value) => ("content", value.into()),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -4427,22 +4228,13 @@ pub mod notification {
         type Cursor = UniqueWhereParam;
         const MODEL: &'static str = "Notification";
         fn scalar_selections() -> Vec<::prisma_client_rust::Selection> {
-            [
-                "id",
-                "createdAt",
-                "recipientId",
-                "read",
-                "nType",
-                "reason",
-                "excerpt",
-                "citation",
-            ]
-            .into_iter()
-            .map(|o| {
-                let builder = ::prisma_client_rust::Selection::builder(o);
-                builder.build()
-            })
-            .collect()
+            ["id", "createdAt", "recipientId", "read", "nType", "content"]
+                .into_iter()
+                .map(|o| {
+                    let builder = ::prisma_client_rust::Selection::builder(o);
+                    builder.build()
+                })
+                .collect()
         }
     }
     impl<'a> Actions<'a> {
@@ -4459,30 +4251,21 @@ pub mod notification {
             self,
             recipient: super::user::UniqueWhereParam,
             n_type: NotificationType,
-            reason: String,
-            excerpt: String,
-            citation: String,
+            content: String,
             mut _params: Vec<SetParam>,
         ) -> Create<'a> {
             _params.push(recipient::connect(recipient));
             _params.push(n_type::set(n_type));
-            _params.push(reason::set(reason));
-            _params.push(excerpt::set(excerpt));
-            _params.push(citation::set(citation));
+            _params.push(content::set(content));
             Create::new(self.client, _params)
         }
-        pub fn create_many(
-            self,
-            data: Vec<(String, NotificationType, String, String, String, Vec<SetParam>)>,
-        ) -> CreateMany<'a> {
+        pub fn create_many(self, data: Vec<(String, NotificationType, String, Vec<SetParam>)>) -> CreateMany<'a> {
             let data = data
                 .into_iter()
-                .map(|(recipient_id, n_type, reason, excerpt, citation, mut _params)| {
+                .map(|(recipient_id, n_type, content, mut _params)| {
                     _params.push(recipient_id::set(recipient_id));
                     _params.push(n_type::set(n_type));
-                    _params.push(reason::set(reason));
-                    _params.push(excerpt::set(excerpt));
-                    _params.push(citation::set(citation));
+                    _params.push(content::set(content));
                     _params
                 })
                 .collect();
@@ -4497,11 +4280,9 @@ pub mod notification {
         pub fn upsert(
             self,
             _where: UniqueWhereParam,
-            (recipient, n_type, reason, excerpt, citation, mut _params): (
+            (recipient, n_type, content, mut _params): (
                 super::user::UniqueWhereParam,
                 NotificationType,
-                String,
-                String,
                 String,
                 Vec<SetParam>,
             ),
@@ -4509,9 +4290,7 @@ pub mod notification {
         ) -> Upsert<'a> {
             _params.push(recipient::connect(recipient));
             _params.push(n_type::set(n_type));
-            _params.push(reason::set(reason));
-            _params.push(excerpt::set(excerpt));
-            _params.push(citation::set(citation));
+            _params.push(content::set(content));
             Upsert::new(self.client, _where.into(), _params, _update)
         }
         pub fn delete(self, _where: UniqueWhereParam) -> Delete<'a> {
@@ -4637,12 +4416,8 @@ pub mod _prisma {
         Read,
         #[serde(rename = "nType")]
         NType,
-        #[serde(rename = "reason")]
-        Reason,
-        #[serde(rename = "excerpt")]
-        Excerpt,
-        #[serde(rename = "citation")]
-        Citation,
+        #[serde(rename = "content")]
+        Content,
     }
     impl ToString for NotificationScalarFieldEnum {
         fn to_string(&self) -> String {
@@ -4652,9 +4427,7 @@ pub mod _prisma {
                 Self::RecipientId => "recipientId".to_string(),
                 Self::Read => "read".to_string(),
                 Self::NType => "nType".to_string(),
-                Self::Reason => "reason".to_string(),
-                Self::Excerpt => "excerpt".to_string(),
-                Self::Citation => "citation".to_string(),
+                Self::Content => "content".to_string(),
             }
         }
     }
