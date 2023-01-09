@@ -17,6 +17,7 @@ use color_eyre::eyre::Context;
 use lazy_static::lazy_static;
 use prisma_client_rust::{Direction, QueryError};
 use rocket::request::FromParam;
+use std::str::FromStr;
 use uuid::Uuid;
 
 lazy_static! {
@@ -269,6 +270,53 @@ pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, 
         .await
 }
 
+pub async fn confirm_pending_post(
+    category: Category,
+    id: String,
+    comment: Option<String>,
+) -> Result<notification::Data, QueryError> {
+    let pending_post::Data {
+        author_id: uid,
+        excerpt,
+        citation,
+        submitted_at,
+        ..
+    } = match pending_posts()
+        .await
+        .find_unique(pending_post::UniqueWhereParam::IdEquals(id.clone()))
+        .exec()
+        .await?
+    {
+        Some(p) => p,
+        None => {
+            return Err(QueryError::Deserialize(serde_value::DeserializerError::Custom(
+                "Not Found".to_owned(),
+            )))
+        }
+    };
+
+    remove_pending_post(category, id.clone()).await?;
+
+    let new_id = Uuid::new_v4();
+
+    create_post(
+        category,
+        new_id,
+        Uuid::from_str(uid.as_str()).unwrap(),
+        excerpt,
+        citation,
+        submitted_at,
+    )
+    .await?;
+
+    let notif = NotificationContent::PostApproval {
+        url: format!("/posts/{}?id={new_id}", category.to_string().to_ascii_lowercase()),
+        comment,
+    };
+
+    create_notification(uid, &notif).await
+}
+
 pub async fn reject_pending_post(
     category: Category,
     id: String,
@@ -295,7 +343,7 @@ pub async fn reject_pending_post(
 
     remove_pending_post(category, id.clone()).await?;
 
-    let notif = Notification::PostRejection {
+    let notif = NotificationContent::PostRejection {
         comment,
         excerpt,
         citation,
@@ -304,7 +352,7 @@ pub async fn reject_pending_post(
     create_notification(uid, &notif).await
 }
 
-pub async fn create_notification(uid: String, notif: &Notification) -> Result<notification::Data, QueryError> {
+pub async fn create_notification(uid: String, notif: &NotificationContent) -> Result<notification::Data, QueryError> {
     let content = serde_json::to_string(notif).unwrap();
 
     notifications()
@@ -316,7 +364,7 @@ pub async fn create_notification(uid: String, notif: &Notification) -> Result<no
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum Notification {
+pub enum NotificationContent {
     PostApproval {
         url: String,
         comment: Option<String>,
@@ -328,11 +376,11 @@ pub enum Notification {
     },
 }
 
-impl Notification {
+impl NotificationContent {
     pub fn enum_type(&self) -> NotificationType {
         match self {
-            Notification::PostApproval { .. } => NotificationType::Approval,
-            Notification::PostRejection { .. } => NotificationType::Rejection,
+            NotificationContent::PostApproval { .. } => NotificationType::Approval,
+            NotificationContent::PostRejection { .. } => NotificationType::Rejection,
         }
     }
 }

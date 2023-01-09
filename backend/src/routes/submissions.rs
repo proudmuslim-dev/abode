@@ -1,14 +1,15 @@
 use crate::{
     db::{
-        prisma::{notification, pending_post, post, Category},
+        prisma::{pending_post, Category},
         util::{
-            create_pending_post, create_post, get_pending_post, get_section_pending_posts, get_user_pending_posts,
-            get_user_pending_posts_in_section, reject_pending_post, remove_pending_post,
+            confirm_pending_post, create_pending_post, get_pending_post, get_section_pending_posts,
+            get_user_pending_posts, get_user_pending_posts_in_section, reject_pending_post,
         },
     },
     routes::utils::{
         headers::{AuthHeader, AuthLevel, Verifiable},
         misc::{PaginationFields, UuidField},
+        responses::Notification,
     },
 };
 use ammonia::clean;
@@ -23,7 +24,7 @@ use rocket::{
 };
 use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+
 use uuid::Uuid;
 
 #[get("/submissions/<section>?<id>", rank = 1)]
@@ -111,47 +112,21 @@ pub async fn new_submission(
     Ok(PostSubmissionResponse { id: id.to_string() })
 }
 
-// TODO: Notify user of approval
 #[post("/submissions/<section>/confirm", data = "<post>")]
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
     post: Form<Strict<PostConfirmation>>,
-) -> Result<Json<post::Data>, Status> {
+) -> Result<Json<Notification>, Status> {
     let _c = auth_header.verify()?;
 
     let id = post.id.to_string();
 
-    let pending_post = {
-        let p = get_pending_post(section, id.clone())
-            .await
-            .map_err(|_| Status::InternalServerError)?;
+    let ret = confirm_pending_post(section, id, post.comment.clone())
+        .await
+        .map_err(map_err)?;
 
-        if p.is_some() {
-            remove_pending_post(section, id)
-                .await
-                .map_err(|_| Status::InternalServerError)?;
-
-            p.unwrap()
-        } else {
-            return Err(Status::NotFound);
-        }
-    };
-
-    let id = Uuid::new_v4();
-
-    let confirmed = create_post(
-        section,
-        id,
-        Uuid::from_str(pending_post.author_id.as_str()).unwrap(),
-        pending_post.excerpt,
-        pending_post.citation,
-        pending_post.submitted_at,
-    )
-    .await
-    .map_err(|_| Status::InternalServerError)?;
-
-    Ok(Json(confirmed))
+    Ok(Json(Notification::from(ret)))
 }
 
 #[delete("/submissions/<section>/reject", data = "<rejection>")]
@@ -159,31 +134,22 @@ pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
     rejection: Form<Strict<PostRejection>>,
-) -> Result<Json<notification::Data>, Status> {
+) -> Result<Json<Notification>, Status> {
     let _c = auth_header.verify()?;
 
     let id = rejection.submission_id.to_string();
 
     let ret = reject_pending_post(section, id, rejection.comment.clone())
         .await
-        .map_err(|e| match e {
-            QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
-                if err.eq("Not Found") {
-                    Status::NotFound
-                } else {
-                    Status::InternalServerError
-                }
-            }
-            _ => Status::InternalServerError,
-        })?;
+        .map_err(map_err)?;
 
-    // TODO: Serialize the notification content as well
-    Ok(Json(ret))
+    Ok(Json(Notification::from(ret)))
 }
 
 #[derive(FromForm)]
 pub struct PostConfirmation {
     pub(crate) id: UuidField,
+    pub(crate) comment: Option<String>,
 }
 
 #[derive(FromForm)]
@@ -209,6 +175,19 @@ fn convert_and_sanitize(s: &str) -> String {
     html::push_html(&mut unsafe_html, md_parse);
 
     clean(unsafe_html.as_str())
+}
+
+fn map_err(e: QueryError) -> Status {
+    match e {
+        QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
+            if err.eq("Not Found") {
+                Status::NotFound
+            } else {
+                Status::InternalServerError
+            }
+        }
+        _ => Status::InternalServerError,
+    }
 }
 
 #[derive(Serialize, Deserialize)]
