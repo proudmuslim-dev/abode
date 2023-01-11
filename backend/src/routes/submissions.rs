@@ -133,7 +133,7 @@ pub async fn confirm_submission(
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    rejection: Form<Strict<PostRejection>>,
+    rejection: Json<PostRejection>,
 ) -> Result<Json<Notification>, Status> {
     let _c = auth_header.verify()?;
 
@@ -152,9 +152,9 @@ pub struct PostConfirmation {
     pub(crate) comment: Option<String>,
 }
 
-#[derive(FromForm)]
+#[derive(Deserialize)]
 pub struct PostRejection {
-    #[field(name = uncased("id"))]
+    #[serde(rename = "id")]
     pub(crate) submission_id: UuidField,
     pub(crate) comment: Option<String>,
 }

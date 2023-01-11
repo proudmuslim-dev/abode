@@ -2,9 +2,7 @@ use crate::{
     db::{
         prisma,
         prisma::{
-            notification,
-            notification::WhereParam,
-            pending_post, post, user,
+            notification, pending_post, post, user,
             user::{SetParam, UniqueWhereParam},
             Category, NotificationType, PrismaClient,
         },
@@ -89,11 +87,11 @@ pub async fn get_user_notifications(
     user: Uuid,
     which: WhichNotifications,
 ) -> Result<Vec<notification::Data>, QueryError> {
-    let mut filters = vec![WhereParam::RecipientIdEquals(user.to_string())];
+    let mut filters = vec![notification::WhereParam::RecipientIdEquals(user.to_string())];
 
     match which {
-        WhichNotifications::Read => filters.push(WhereParam::ReadEquals(true)),
-        WhichNotifications::Unread => filters.push(WhereParam::ReadEquals(false)),
+        WhichNotifications::Read => filters.push(notification::WhereParam::ReadEquals(true)),
+        WhichNotifications::Unread => filters.push(notification::WhereParam::ReadEquals(false)),
         WhichNotifications::All => {}
     }
 
@@ -360,6 +358,45 @@ pub async fn create_notification(uid: String, notif: &NotificationContent) -> Re
         .create(UniqueWhereParam::IdEquals(uid), notif.enum_type(), content, vec![])
         .exec()
         .await
+}
+
+pub async fn update_user_notification(uid: String, id: String, read: bool) -> Result<(), QueryError> {
+    notifications()
+        .await
+        .update_many(
+            vec![
+                notification::WhereParam::RecipientIdEquals(uid),
+                notification::WhereParam::IdEquals(id),
+            ],
+            vec![notification::SetParam::SetRead(read)],
+        )
+        .exec()
+        .await?;
+
+    Ok(())
+}
+
+pub async fn delete_user_notification(uid: String, id: String) -> Result<(), QueryError> {
+    notifications()
+        .await
+        .delete_many(vec![
+            notification::WhereParam::RecipientIdEquals(uid),
+            notification::WhereParam::IdEquals(id),
+        ])
+        .exec()
+        .await?;
+
+    Ok(())
+}
+
+pub async fn delete_notification(id: String) -> Result<(), QueryError> {
+    notifications()
+        .await
+        .delete(notification::UniqueWhereParam::IdEquals(id))
+        .exec()
+        .await?;
+
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize)]

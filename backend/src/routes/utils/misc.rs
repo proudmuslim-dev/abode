@@ -8,7 +8,7 @@ use std::{ops::Deref, str::FromStr};
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize)]
 pub struct UuidField(pub(crate) Uuid);
 
 impl Deref for UuidField {

@@ -4,19 +4,16 @@ use crate::{
         prisma::{post, Category},
         util::{get_user_posts, get_user_posts_in_section, remove_post},
     },
-    routes::{
-        submissions::PostConfirmation,
-        utils::{
-            headers::{AuthHeader, AuthLevel, Verifiable},
-            misc::{PaginationFields, UuidField},
-        },
+    routes::utils::{
+        headers::{AuthHeader, AuthLevel, Verifiable},
+        misc::{PaginationFields, UuidField},
     },
 };
 use rocket::{
-    form::{Form, Strict},
     http::Status,
     serde::json::{json, Json, Value},
 };
+use uuid::Uuid;
 
 #[get("/posts/<section>?<id>", rank = 1)]
 pub async fn get_post(section: Category, id: UuidField) -> Result<Json<post::Data>, Status> {
@@ -72,7 +69,7 @@ pub async fn get_author_section_posts(
 pub async fn delete_post(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    post: Form<Strict<PostConfirmation>>,
+    post: Json<PostDeletion>,
 ) -> Result<Value, Status> {
     let _c = auth_header.verify()?;
 
@@ -83,4 +80,9 @@ pub async fn delete_post(
         .map_err(|_| Status::InternalServerError)?;
 
     Ok(json!({ "id": id }))
+}
+
+#[derive(Deserialize)]
+pub struct PostDeletion {
+    pub(crate) id: Uuid,
 }
