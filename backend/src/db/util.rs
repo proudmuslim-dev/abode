@@ -2,7 +2,9 @@ use crate::{
     db::{
         prisma,
         prisma::{
-            notification, pending_post, post, user,
+            notification, pending_post, post,
+            read_filters::{BoolFilter, StringFilter},
+            user,
             user::{SetParam, UniqueWhereParam},
             Category, NotificationType, PrismaClient,
         },
@@ -87,11 +89,13 @@ pub async fn get_user_notifications(
     user: Uuid,
     which: WhichNotifications,
 ) -> Result<Vec<notification::Data>, QueryError> {
-    let mut filters = vec![notification::WhereParam::RecipientIdEquals(user.to_string())];
+    let mut filters = vec![notification::WhereParam::RecipientId(StringFilter::Equals(
+        user.to_string(),
+    ))];
 
     match which {
-        WhichNotifications::Read => filters.push(notification::WhereParam::ReadEquals(true)),
-        WhichNotifications::Unread => filters.push(notification::WhereParam::ReadEquals(false)),
+        WhichNotifications::Read => filters.push(notification::WhereParam::Read(BoolFilter::Equals(true))),
+        WhichNotifications::Unread => filters.push(notification::WhereParam::Read(BoolFilter::Equals(false))),
         WhichNotifications::All => {}
     }
 
@@ -365,8 +369,8 @@ pub async fn update_user_notification(uid: String, id: String, read: bool) -> Re
         .await
         .update_many(
             vec![
-                notification::WhereParam::RecipientIdEquals(uid),
-                notification::WhereParam::IdEquals(id),
+                notification::WhereParam::RecipientId(StringFilter::Equals(uid)),
+                notification::WhereParam::Id(StringFilter::Equals(id)),
             ],
             vec![notification::SetParam::SetRead(read)],
         )
@@ -380,8 +384,8 @@ pub async fn delete_user_notification(uid: String, id: String) -> Result<(), Que
     notifications()
         .await
         .delete_many(vec![
-            notification::WhereParam::RecipientIdEquals(uid),
-            notification::WhereParam::IdEquals(id),
+            notification::WhereParam::RecipientId(StringFilter::Equals(uid)),
+            notification::WhereParam::Id(StringFilter::Equals(id)),
         ])
         .exec()
         .await?;

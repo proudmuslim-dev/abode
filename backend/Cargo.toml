@@ -22,7 +22,9 @@ features = ["full"]
 
 [dependencies.prisma-client-rust]
 git = "https://github.com/Brendonovich/prisma-client-rust"
-tag = "0.6.3"
+tag = "0.6.4"
+default-features = false
+features = ["mysql"]
 
 [dependencies.chrono]
 version = "0.4.23"
