@@ -2,11 +2,9 @@ use crate::{
     db::{
         prisma,
         prisma::{
-            notification, pending_post, post,
+            image, notification, pending_image, pending_post, post,
             read_filters::{BoolFilter, StringFilter},
-            user,
-            user::{SetParam, UniqueWhereParam},
-            Category, NotificationType, PrismaClient,
+            user, Category, NotificationType, PrismaClient,
         },
     },
     routes::utils::{jwt::generate_api_token, misc::PaginationFields},
@@ -25,21 +23,19 @@ lazy_static! {
         AsyncOnce::new(async { prisma::new_client().await.unwrap() });
 }
 
-pub async fn users<'a>() -> user::Actions<'a> {
-    PRISMA_CLIENT.get().await.user()
+macro_rules! table_helper {
+    ($($table:ident),*) => {
+        paste::paste! {
+            $(
+                pub async fn [<$table s>]<'a>() -> $table::Actions<'a> {
+                    PRISMA_CLIENT.get().await.$table()
+                }
+            )*
+        }
+    }
 }
 
-pub async fn posts<'a>() -> post::Actions<'a> {
-    PRISMA_CLIENT.get().await.post()
-}
-
-pub async fn pending_posts<'a>() -> pending_post::Actions<'a> {
-    PRISMA_CLIENT.get().await.pending_post()
-}
-
-pub async fn notifications<'a>() -> notification::Actions<'a> {
-    PRISMA_CLIENT.get().await.notification()
-}
+table_helper!(user, post, pending_post, image, pending_image, notification);
 
 macro_rules! find_in_posts {
     (post, $pagination:ident, $($filter:expr),*) => {
@@ -69,7 +65,7 @@ macro_rules! find_in_posts {
 pub async fn create_user(id: Uuid, username: String, password: String) -> Result<String, Box<dyn std::error::Error>> {
     users()
         .await
-        .create(username, password, vec![SetParam::SetId(id.to_string())])
+        .create(username, password, vec![user::SetParam::SetId(id.to_string())])
         .exec()
         .await?;
 
@@ -79,7 +75,7 @@ pub async fn create_user(id: Uuid, username: String, password: String) -> Result
 pub async fn get_user(username: String) -> Option<user::Data> {
     users()
         .await
-        .find_unique(UniqueWhereParam::UsernameEquals(username))
+        .find_unique(user::UniqueWhereParam::UsernameEquals(username))
         .exec()
         .await
         .unwrap()
@@ -148,7 +144,7 @@ pub async fn create_post(
     posts()
         .await
         .create(
-            UniqueWhereParam::IdEquals(author_id.to_string()),
+            user::UniqueWhereParam::IdEquals(author_id.to_string()),
             category,
             excerpt,
             citation,
@@ -213,7 +209,7 @@ pub async fn create_pending_post(
     pending_posts()
         .await
         .create(
-            UniqueWhereParam::IdEquals(author_id.to_string()),
+            user::UniqueWhereParam::IdEquals(author_id.to_string()),
             category,
             excerpt,
             citation,
@@ -268,6 +264,22 @@ pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, 
             pending_post::category::equals(category),
             pending_post::id::equals(id),
         ])
+        .exec()
+        .await
+}
+
+pub async fn create_image(post_id: String, path: String) -> Result<image::Data, QueryError> {
+    images()
+        .await
+        .create(post::UniqueWhereParam::IdEquals(post_id), path, vec![])
+        .exec()
+        .await
+}
+
+pub async fn create_pending_image(post_id: String, path: String) -> Result<pending_image::Data, QueryError> {
+    pending_images()
+        .await
+        .create(pending_post::UniqueWhereParam::IdEquals(post_id), path, vec![])
         .exec()
         .await
 }
@@ -359,7 +371,12 @@ pub async fn create_notification(uid: String, notif: &NotificationContent) -> Re
 
     notifications()
         .await
-        .create(UniqueWhereParam::IdEquals(uid), notif.enum_type(), content, vec![])
+        .create(
+            user::UniqueWhereParam::IdEquals(uid),
+            notif.enum_type(),
+            content,
+            vec![],
+        )
         .exec()
         .await
 }

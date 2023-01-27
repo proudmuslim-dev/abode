@@ -57,12 +57,16 @@ model Image {
   post   Post   @relation(fields: [postId], references: [id])
   postId String
   path   String @id
+  width  Int
+  height Int
 }
 
 model PendingImage {
   post   PendingPost @relation(fields: [postId], references: [id])
   postId String
   path   String      @id
+  width  Int
+  height Int
 }
 
 /// * Notif ID
