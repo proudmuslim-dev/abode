@@ -1,14 +1,12 @@
 // Needed because of the default attrs on FromForm
 #![allow(clippy::needless_late_init)]
 
-use image::{imageops::FilterType, io::Reader as ImageReader, ImageFormat, ImageOutputFormat};
+use image::{io::Reader as ImageReader, ImageError, ImageFormat, ImageOutputFormat};
 use imagesize::ImageSize;
 use rocket::{
-    data::{FromData, Outcome, ToByteUnit},
-    form::{Form, FromFormField, Strict, ValueField},
-    fs::TempFile,
-    http::{ContentType, Status},
-    Data, Either, Request,
+    data::ToByteUnit,
+    form::{DataField, Form, FromFormField, Strict, ValueField},
+    http::ContentType,
 };
 use sanitizer::Sanitize;
 use std::{io::Cursor, ops::Deref, str::FromStr};
@@ -61,45 +59,83 @@ impl PaginationFields {
     }
 }
 
-pub struct ImageGuard {
+pub struct ImageField {
     pub(crate) width: usize,
     pub(crate) height: usize,
-    pub(crate) bytes: Vec<u8>,
+    bytes: Vec<u8>,
+    /// Can only be PNG or JPEG
+    format: ImageFormat,
+}
+
+impl ImageField {
+    pub fn persist(&self) -> std::io::Result<String> {
+        let mut path = {
+            let id = Uuid::new_v4();
+            let ext = self.format.extensions_str()[0];
+
+            format!("assets/images/{id}.{ext}")
+        };
+
+        let img = image::load_from_memory_with_format(&self.bytes, self.format)
+            .expect("Can't fail because it's only instantiated by the from_data fn");
+
+        match img.save(path.as_str()) {
+            Ok(_) => {
+                path.insert(0, '/');
+
+                Ok(path)
+            },
+            Err(ImageError::IoError(e)) => Err(e),
+            _ => unimplemented!("There's really no reason that this should be reached, and if it is that means there's a bug in the FromFormField impl"),
+        }
+    }
 }
 
 #[async_trait]
-impl<'r> FromData<'r> for ImageGuard {
-    type Error = ();
+impl<'r> FromFormField<'r> for ImageField {
+    fn from_value(_: ValueField<'r>) -> rocket::form::Result<'r, Self> {
+        Err(rocket::form::Error::validation("Missing Content-Type on image field!"))?
+    }
 
-    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
+    async fn from_data(field: DataField<'r, '_>) -> rocket::form::Result<'r, Self> {
+        let internal_server_error = Err(rocket::form::Error::validation("Internal server error"));
+
+        let limit = field.request.limits().get("image").unwrap_or(4.mebibytes());
+
+        let req_ct = field.content_type;
         let (png_ct, jpeg_ct) = (ContentType::new("image", "png"), ContentType::new("image", "jpeg"));
-        let req_ct = req.content_type();
 
-        if req_ct != Some(&png_ct) && req_ct != Some(&jpeg_ct) {
-            return Outcome::Forward(data);
+        if req_ct != png_ct && req_ct != jpeg_ct {
+            return Err(rocket::form::Error::validation("Not a PNG or JPEG image"))?;
         }
 
-        let mut bytes = match data.open(4.mebibytes()).into_bytes().await {
+        let mut bytes = match field.data.open(limit).into_bytes().await {
             Ok(bytes) if bytes.is_complete() => bytes.into_inner(),
-            Ok(_) => return Outcome::Failure((Status::PayloadTooLarge, ())),
-            Err(_) => return Outcome::Failure((Status::InternalServerError, ())),
+            Ok(_) => return Err((None, Some(limit)))?,
+            // TODO: Figure out how to make this thing actually return what I want it to
+            Err(_) => return internal_server_error?,
         };
 
         if let Ok(ImageSize { width, height }) = imagesize::blob_size(&bytes) {
-            if req_ct == Some(&jpeg_ct) {
+            let format;
+
+            if req_ct == jpeg_ct {
                 let mut cursor = Cursor::new(bytes);
                 let mut cursor_2 = Cursor::new(vec![]);
-                let exif_reader = exif::Reader::new();
 
-                let rotation = match exif_reader.read_from_container(&mut cursor) {
-                    Ok(exif) => match exif.get_field(exif::Tag::Orientation, exif::In::PRIMARY) {
-                        Some(orientation) => match orientation.value.get_uint(0) {
-                            Some(v @ 1..=8) => v,
+                let rotation = {
+                    let exif_reader = exif::Reader::new();
+
+                    match exif_reader.read_from_container(&mut cursor) {
+                        Ok(exif) => match exif.get_field(exif::Tag::Orientation, exif::In::PRIMARY) {
+                            Some(orientation) => match orientation.value.get_uint(0) {
+                                Some(v @ 1..=8) => v,
+                                _ => 0,
+                            },
                             _ => 0,
                         },
                         _ => 0,
-                    },
-                    _ => 0,
+                    }
                 };
 
                 cursor.set_position(0);
@@ -109,10 +145,10 @@ impl<'r> FromData<'r> for ImageGuard {
                     if let Ok(i) = r.decode() {
                         i
                     } else {
-                        return Outcome::Failure((Status::InternalServerError, ()));
+                        return internal_server_error?;
                     }
                 } else {
-                    return Outcome::Failure((Status::InternalServerError, ()));
+                    return internal_server_error?;
                 };
 
                 let result = match &rotation {
@@ -128,15 +164,23 @@ impl<'r> FromData<'r> for ImageGuard {
                 .write_to(&mut cursor_2, ImageOutputFormat::Jpeg(100));
 
                 if result.is_err() {
-                    return Outcome::Failure((Status::InternalServerError, ()));
+                    return internal_server_error?;
                 }
 
                 bytes = cursor_2.into_inner();
+                format = ImageFormat::Jpeg;
+            } else {
+                format = ImageFormat::Png;
             }
 
-            Outcome::Success(ImageGuard { width, height, bytes })
+            Ok(ImageField {
+                width,
+                height,
+                bytes,
+                format,
+            })
         } else {
-            Outcome::Failure((Status::BadRequest, ()))
+            Err(rocket::form::Error::validation("Bad image"))?
         }
     }
 }
@@ -164,54 +208,4 @@ where
     form.sanitize();
 
     Some(form)
-}
-
-// TODO: Add images to db in route
-pub fn handle_image(file: &TempFile<'_>) -> Result<String, Status> {
-    match file {
-        TempFile::File { path, content_type, .. } => {
-            if content_type.is_none() {
-                dbg!("No img type.");
-                return Err(Status::BadRequest);
-            }
-
-            let id = Uuid::new_v4();
-
-            let content_type = content_type.clone().expect("Won't fail, checked above");
-
-            let format = if content_type.is_png() {
-                ImageFormat::Png
-            } else if content_type.is_jpeg() {
-                ImageFormat::Jpeg
-            } else {
-                dbg!("Bad img type.");
-                return Err(Status::BadRequest);
-            };
-
-            let mut reader = match path {
-                Either::Left(temp) => ImageReader::open(temp),
-                Either::Right(p_buf) => ImageReader::open(p_buf),
-            }
-            .map_err(|_| Status::InternalServerError)?;
-
-            reader.set_format(format);
-
-            let image = reader.decode().map_err(|_| {
-                dbg!("Failed to decode");
-                Status::InternalServerError
-            })?;
-
-            // 795x1025
-            let new_image = image.resize(795, 1025, FilterType::Lanczos3);
-
-            let path = format!("assets/images/{id}.jpeg");
-
-            new_image
-                .save_with_format(path.as_str(), ImageFormat::Jpeg)
-                .map_err(|_| Status::InternalServerError)?;
-
-            Ok(path.replace("assets/", ""))
-        }
-        TempFile::Buffered { .. } => Err(Status::BadRequest),
-    }
 }

@@ -165,6 +165,14 @@ pub async fn get_post(category: Category, id: String) -> Result<Option<post::Dat
         .await
 }
 
+pub async fn get_post_by_id(id: String) -> Result<Option<post::Data>, QueryError> {
+    posts()
+        .await
+        .find_unique(post::UniqueWhereParam::IdEquals(id))
+        .exec()
+        .await
+}
+
 pub async fn get_section_posts(
     category: Category,
     pagination: PaginationFields,
@@ -230,6 +238,14 @@ pub async fn get_pending_post(category: Category, id: String) -> Result<Option<p
         .await
 }
 
+pub async fn get_pending_post_by_id(id: String) -> Result<Option<pending_post::Data>, QueryError> {
+    pending_posts()
+        .await
+        .find_unique(pending_post::UniqueWhereParam::IdEquals(id))
+        .exec()
+        .await
+}
+
 pub async fn get_section_pending_posts(
     category: Category,
     pagination: PaginationFields,
@@ -268,18 +284,29 @@ pub async fn remove_pending_post(category: Category, id: String) -> Result<i64, 
         .await
 }
 
-pub async fn create_image(post_id: String, path: String) -> Result<image::Data, QueryError> {
+pub async fn create_image(post_id: String, path: String, width: i32, height: i32) -> Result<image::Data, QueryError> {
     images()
         .await
-        .create(post::UniqueWhereParam::IdEquals(post_id), path, vec![])
+        .create(post::UniqueWhereParam::IdEquals(post_id), path, width, height, vec![])
         .exec()
         .await
 }
 
-pub async fn create_pending_image(post_id: String, path: String) -> Result<pending_image::Data, QueryError> {
+pub async fn create_pending_image(
+    post_id: String,
+    path: String,
+    width: i32,
+    height: i32,
+) -> Result<pending_image::Data, QueryError> {
     pending_images()
         .await
-        .create(pending_post::UniqueWhereParam::IdEquals(post_id), path, vec![])
+        .create(
+            pending_post::UniqueWhereParam::IdEquals(post_id),
+            path,
+            width,
+            height,
+            vec![],
+        )
         .exec()
         .await
 }

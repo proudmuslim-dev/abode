@@ -9,7 +9,7 @@ use backend::routes::{
     sign_up::sign_up,
     submissions::{
         confirm_submission, get_author_section_submissions, get_author_submissions, get_section_submissions,
-        get_submission, new_submission, reject_submission,
+        get_submission, new_submission, new_submission_image, reject_submission,
     },
 };
 use rocket::fs::{relative, FileServer};
@@ -42,9 +42,10 @@ async fn rocket() -> _ {
                 get_section_submissions,
                 get_author_section_submissions,
                 new_submission,
+                new_submission_image,
                 confirm_submission,
                 reject_submission
             ],
         )
-        .mount("/", FileServer::from(relative!("assets")))
+        .mount("/assets", FileServer::from(relative!("assets")))
 }

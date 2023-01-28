@@ -24,7 +24,15 @@ use rocket::{
 };
 use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
+use crate::{
+    db::{
+        prisma::pending_image,
+        util::{create_pending_image, get_pending_post_by_id},
+    },
+    routes::utils::misc::ImageField,
+};
 use uuid::Uuid;
 
 #[get("/submissions/<section>?<id>", rank = 1)]
@@ -112,6 +120,42 @@ pub async fn new_submission(
     Ok(PostSubmissionResponse { id: id.to_string() })
 }
 
+#[post("/submissions/images", data = "<form>")]
+pub async fn new_submission_image(
+    auth_header: AuthHeader,
+    form: Form<Strict<ImageSubmission>>,
+) -> Result<Json<pending_image::Data>, Status> {
+    let c = auth_header.verify()?;
+
+    match get_pending_post_by_id(form.post_id.to_string())
+        .await
+        .map_err(|_| Status::InternalServerError)?
+    {
+        Some(pending_post::Data { author_id, .. }) => {
+            if !c.admin {
+                let author_id = Uuid::from_str(author_id.as_str()).map_err(|_| Status::InternalServerError)?;
+
+                if author_id != c.sub {
+                    return Err(Status::Unauthorized);
+                }
+            }
+        }
+        None => return Err(Status::NotFound),
+    }
+
+    let ret = {
+        let width = i32::try_from(form.image.width).map_err(|_| Status::BadRequest)?;
+        let height = i32::try_from(form.image.height).map_err(|_| Status::BadRequest)?;
+        let path = form.image.persist().map_err(|_| Status::InternalServerError)?;
+
+        create_pending_image(form.post_id.to_string(), path, width, height)
+            .await
+            .map_err(|_| Status::InternalServerError)?
+    };
+
+    Ok(Json(ret))
+}
+
 #[post("/submissions/<section>/confirm", data = "<post>")]
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
@@ -150,6 +194,12 @@ pub async fn reject_submission(
 pub struct PostConfirmation {
     pub(crate) id: UuidField,
     pub(crate) comment: Option<String>,
+}
+
+#[derive(FromForm)]
+pub struct ImageSubmission {
+    pub(crate) post_id: UuidField,
+    pub(crate) image: ImageField,
 }
 
 #[derive(Deserialize)]
