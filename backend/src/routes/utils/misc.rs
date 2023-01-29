@@ -188,7 +188,7 @@ impl<'r> FromFormField<'r> for ImageField {
 pub fn validate_username(username: &str) -> Result<(), ValidationError> {
     let mut username = username.to_owned();
 
-    username.retain(|c| !c.is_whitespace());
+    username.retain(|c| !c.is_whitespace() && c.is_ascii());
 
     // Don't waste time if it's a junk req
     if username.is_empty() {

@@ -48,7 +48,7 @@ pub async fn sign_in(login: Form<Strict<LoginForm>>) -> Result<LoginResponse, St
 #[derive(FromForm, Debug, Deserialize, Validate, Sanitize)]
 pub struct LoginForm {
     #[sanitize(trim, lower_case)]
-    #[validate(length(min = 3), custom = "validate_username")]
+    #[validate(range(min = 3, max = 50), custom = "validate_username")]
     username: String,
     #[sanitize(trim)]
     password: String,

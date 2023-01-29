@@ -28,7 +28,7 @@
         border-radius: 5px;
     }
 
-    .green {
+    .blue {
         color: #fff !important;
         background-color: #192330 !important
     }
@@ -36,7 +36,7 @@
 
 <form method="POST">
     <label for="username">Username</label>
-    <input type="text" id="username" name="username" required>
+    <input type="text" id="username" name="username" minlength="3" maxlength="50" pattern="/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/" required>
 
     <br><br>
 
@@ -46,7 +46,7 @@
     <br><br>
 
     <div align="center">
-    <button type="submit" class="green">Submit</button>
+    <button type="submit" class="blue">Submit</button>
     </div>
 </form>
 

@@ -1,3 +1,2 @@
 [toolchain]
-# TODO: Upgrade toolchain
-channel = "nightly-2022-12-29"
+channel = "nightly"
