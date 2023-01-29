@@ -1,0 +1,73 @@
+<head>
+    <title>Abode</title>
+
+    <style type="text/css">
+        html {
+            font-family: sans-serif;
+        }
+
+        body {
+            background-color: #0a0e14 !important;
+        }
+
+        body, p {
+            color: white;
+        }
+
+        hr {
+            color: #3e5781;
+        }
+
+        p.heading {
+            padding: 10px;
+            background: #192330;
+            position: sticky;
+            border-radius: 5px;
+        }
+
+        header {
+            display: table;
+            position: relative;
+            width: 100%;
+        }
+
+        .login {
+            vertical-align: top;
+            position: absolute;
+            right: 5px;
+        }
+
+        .header-entry {
+            vertical-align: top;
+            position: relative;
+        }
+
+        .logo {
+            vertical-align: top;
+            width: 20px;
+            height: auto;
+            border-radius: 20px;
+            transition: transform 1.2s ease-in-out;
+        }
+
+        .logo:hover {
+            transform: rotate(540deg);
+            transition-delay: 0;
+        }
+   </style>
+</head>
+
+<header>
+    <p class="heading">
+        <a href="/about" style="color: white; text-decoration: none;">Abode <img src="/logo.png" class="logo"></img> |</a>
+        <a href="/browse" class="header-entry">Browse</a>
+        <a href="" class="header-entry" style="padding-right: 1%;">Manifesto</a>
+
+        <a href="/sign-in" class="login">Log In</a>
+    </p>
+</header>
+
+<hr>
+
+{% block content %}
+{% endblock content %}

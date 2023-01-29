@@ -1,0 +1,27 @@
+{% extends "base" %}
+
+{% block content %}
+<style>
+h3, h4, p {
+    padding-left: 10px;
+}
+
+</style>
+
+<h3>About</h3>
+
+<h4>Naming</h4>
+
+<p>
+عَبْدِ اللَّهِ بْنِ عُمَرَ ـ رضى الله عنهما ـ قَالَ أَخَذَ رَسُولُ اللَّهِ صلى الله عليه وسلم بِمَنْكِبِي فَقَالَ كُنْ فِي الدُّنْيَا كَأَنَّكَ غَرِيبٌ، أَوْ عَابِرُ سَبِيلٍ
+</p>
+
+<p>
+Abdullah bin Umar said, "Allah's Messenger (ﷺ) took hold of my shoulder and said, 'Be in this world as if you were a stranger or a traveler.'"
+</p>
+
+<p>
+<a href="https://sunnah.com/bukhari:6416">Sahih al-Bukhari 6416</a>
+</p>
+
+{% endblock content %}

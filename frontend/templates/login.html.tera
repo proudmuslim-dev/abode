@@ -1,0 +1,53 @@
+{% extends "base" %}
+
+{% block content %}
+<style>
+    input {
+        background-color: #192330;
+        color: white;
+    }
+
+    input[type=text], input[type=password] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: none;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        border: none;
+        display: inline-block;
+        padding: 8px 16px;
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+        white-space: nowrap;
+        border-radius: 5px;
+    }
+
+    .green {
+        color: #fff !important;
+        background-color: #192330 !important
+    }
+</style>
+
+<form method="POST">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required>
+
+    <br><br>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required>
+
+    <br><br>
+
+    <div align="center">
+    <button type="submit" class="green">Submit</button>
+    </div>
+</form>
+
+{% endblock content %}
