@@ -6,22 +6,23 @@ use crate::{
     routes::utils::{
         headers::{AuthHeader, Verifiable},
         jwt::Claims,
+        misc::PaginationFields,
         responses::Notification,
     },
 };
 use rocket::{http::Status, serde::json::Json};
 use uuid::Uuid;
 
-// TODO: Consider paginating
-#[get("/notifications?<which>")]
+#[get("/notifications?<which>&<pagination..>")]
 pub async fn get_notifications(
     auth_header: AuthHeader,
     which: Option<WhichNotifications>,
+    pagination: PaginationFields,
 ) -> Result<Json<Vec<Notification>>, Status> {
     let which = which.unwrap_or(WhichNotifications::Unread);
     let Claims { sub: user, .. } = auth_header.verify()?;
 
-    let notifs: Vec<Notification> = get_user_notifications(user, which)
+    let notifs: Vec<Notification> = get_user_notifications(user, which, pagination)
         .await
         .map_err(|_| Status::InternalServerError)?
         .into_iter()

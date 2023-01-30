@@ -34,7 +34,7 @@ pub async fn sign_up(signup: Form<Strict<SignUpForm>>) -> Result<LoginResponse, 
 #[derive(FromForm, Deserialize, Validate, Sanitize)]
 pub struct SignUpForm {
     #[sanitize(trim, lower_case)]
-    #[validate(range(min = 3, max = 50), custom = "validate_username")]
+    #[validate(length(min = 3, max = 50), custom = "validate_username")]
     username: String,
     #[sanitize(trim)]
     password: String,

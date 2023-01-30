@@ -7,8 +7,8 @@ extern crate serde;
 mod pages;
 
 use crate::pages::*;
+use rocket::fs::{relative, FileServer};
 use rocket_dyn_templates::Template;
-use rocket::fs::{FileServer, relative};
 
 #[launch]
 async fn launch() -> _ {
@@ -17,4 +17,3 @@ async fn launch() -> _ {
         .mount("/", routes![sign_in_page, browse, about])
         .mount("/", FileServer::from(relative!("assets")))
 }
-

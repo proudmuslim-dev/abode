@@ -84,6 +84,7 @@ pub async fn get_user(username: String) -> Option<user::Data> {
 pub async fn get_user_notifications(
     user: Uuid,
     which: WhichNotifications,
+    pagination: PaginationFields,
 ) -> Result<Vec<notification::Data>, QueryError> {
     let mut filters = vec![notification::WhereParam::RecipientId(StringFilter::Equals(
         user.to_string(),
@@ -99,6 +100,8 @@ pub async fn get_user_notifications(
         .await
         .find_many(filters)
         .order_by(notification::created_at::order(Direction::Desc))
+        .skip(pagination.skip())
+        .take(pagination.per_page.into())
         .exec()
         .await
 }

@@ -1,5 +1,4 @@
-use rocket_dyn_templates::context;
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 
 #[get("/sign-in")]
 pub async fn sign_in_page() -> Template {
