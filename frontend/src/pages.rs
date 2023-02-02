@@ -1,3 +1,5 @@
+use crate::utils::{BrowsePost, Category, BACKEND_URL, REQWEST_CLIENT};
+use rocket::http::Status;
 use rocket_dyn_templates::{context, Template};
 
 #[get("/sign-in")]
@@ -7,18 +9,28 @@ pub async fn sign_in_page() -> Template {
 
 #[get("/browse")]
 pub async fn browse() -> Template {
-    let posts = vec![
-        Post {
-            excerpt: "Passed from code",
-            citation: "Abode: main.rs",
-        },
-        Post {
-            excerpt: "Lorem ipsum dolor sit amet",
-            citation: "Shiqaq-e-dimagh p. [redacted]",
-        },
-    ];
+    Template::render("browse_menu", context! { categories: Category::ALL })
+}
 
-    Template::render("browse", context! { posts })
+#[get("/browse/<category>")]
+pub async fn browse_category(category: Category) -> Result<Template, Status> {
+    let posts = if let Ok(r) = REQWEST_CLIENT
+        .get(format!(
+            "http://{}/posts/{}",
+            BACKEND_URL.as_str(),
+            category.to_string().to_ascii_lowercase()
+        ))
+        .send()
+        .await
+    {
+        r.json::<Vec<BrowsePost>>()
+            .await
+            .expect("If this fails, there's a bug in either the frontend or backend")
+    } else {
+        return Err(Status::InternalServerError);
+    };
+
+    Ok(Template::render("browse", context! { posts }))
 }
 
 #[get("/about")]

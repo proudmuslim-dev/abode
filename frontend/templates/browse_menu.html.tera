@@ -1,0 +1,27 @@
+{% extends "base" %}
+
+{% block content %}
+<style>
+    li {
+        padding: 2px;
+    }
+
+    a {
+        text-decoration: underline solid transparent;
+        transition: text-decoration 0.2s ease-in-out;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<h3>Categories</h3>
+
+<ul>
+{% for category in categories %}
+    <li><a href="/browse/{{ category | lower }}">{{ category }}</li>
+{% endfor %}
+</ul>
+
+{% endblock content %}
