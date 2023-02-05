@@ -1,15 +1,15 @@
 use crate::{
     db::{
-        prisma::{pending_post, Category},
+        prisma::{pending_image, pending_post, Category},
         util::{
-            confirm_pending_post, create_pending_post, get_pending_post, get_section_pending_posts,
-            get_user_pending_posts, get_user_pending_posts_in_section, reject_pending_post,
+            confirm_pending_post, create_pending_image, create_pending_post, get_pending_post, get_pending_post_by_id,
+            get_section_pending_posts, get_user_pending_posts, get_user_pending_posts_in_section, reject_pending_post,
         },
     },
     routes::utils::{
         headers::{AuthHeader, AuthLevel, Verifiable},
-        misc::{PaginationFields, UuidField},
-        responses::Notification,
+        misc::{ImageField, PaginationFields, UuidField},
+        responses::NotificationBody,
     },
 };
 use ammonia::clean;
@@ -25,14 +25,6 @@ use rocket::{
 use sanitizer::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-
-use crate::{
-    db::{
-        prisma::pending_image,
-        util::{create_pending_image, get_pending_post_by_id},
-    },
-    routes::utils::misc::ImageField,
-};
 use uuid::Uuid;
 
 #[get("/submissions/<section>?<id>", rank = 1)]
@@ -105,7 +97,7 @@ pub async fn get_author_section_submissions(
 pub async fn new_submission(
     auth_header: AuthHeader,
     section: Category,
-    mut post: Form<Strict<PostSubmission>>,
+    mut post: Form<Strict<PostSubmissionForm>>,
 ) -> Result<PostSubmissionResponse, Status> {
     let c = auth_header.verify()?;
 
@@ -123,7 +115,7 @@ pub async fn new_submission(
 #[post("/submissions/images", data = "<form>")]
 pub async fn new_submission_image(
     auth_header: AuthHeader,
-    form: Form<Strict<ImageSubmission>>,
+    form: Form<Strict<ImageSubmissionForm>>,
 ) -> Result<Json<pending_image::Data>, Status> {
     let c = auth_header.verify()?;
 
@@ -160,8 +152,8 @@ pub async fn new_submission_image(
 pub async fn confirm_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    post: Form<Strict<PostConfirmation>>,
-) -> Result<Json<Notification>, Status> {
+    post: Form<Strict<PostConfirmationForm>>,
+) -> Result<Json<NotificationBody>, Status> {
     let _c = auth_header.verify()?;
 
     let id = post.id.to_string();
@@ -170,15 +162,15 @@ pub async fn confirm_submission(
         .await
         .map_err(map_err)?;
 
-    Ok(Json(Notification::from(ret)))
+    Ok(Json(NotificationBody::from(ret)))
 }
 
 #[delete("/submissions/<section>/reject", data = "<rejection>")]
 pub async fn reject_submission(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    rejection: Json<PostRejection>,
-) -> Result<Json<Notification>, Status> {
+    rejection: Json<PostRejectionBody>,
+) -> Result<Json<NotificationBody>, Status> {
     let _c = auth_header.verify()?;
 
     let id = rejection.submission_id.to_string();
@@ -187,30 +179,30 @@ pub async fn reject_submission(
         .await
         .map_err(map_err)?;
 
-    Ok(Json(Notification::from(ret)))
+    Ok(Json(NotificationBody::from(ret)))
 }
 
 #[derive(FromForm)]
-pub struct PostConfirmation {
+pub struct PostConfirmationForm {
     pub(crate) id: UuidField,
     pub(crate) comment: Option<String>,
 }
 
 #[derive(FromForm)]
-pub struct ImageSubmission {
+pub struct ImageSubmissionForm {
     pub(crate) post_id: UuidField,
     pub(crate) image: ImageField,
 }
 
 #[derive(Deserialize)]
-pub struct PostRejection {
+pub struct PostRejectionBody {
     #[serde(rename = "id")]
     pub(crate) submission_id: UuidField,
     pub(crate) comment: Option<String>,
 }
 
 #[derive(FromForm, Deserialize, Sanitize)]
-pub struct PostSubmission {
+pub struct PostSubmissionForm {
     #[sanitize(trim, custom(convert_and_sanitize))]
     #[field(validate = len(10..1500))]
     pub excerpt: String,
@@ -227,19 +219,6 @@ fn convert_and_sanitize(s: &str) -> String {
     clean(unsafe_html.as_str())
 }
 
-fn map_err(e: QueryError) -> Status {
-    match e {
-        QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
-            if err.eq("Not Found") {
-                Status::NotFound
-            } else {
-                Status::InternalServerError
-            }
-        }
-        _ => Status::InternalServerError,
-    }
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct PostSubmissionResponse {
     pub id: String,
@@ -250,5 +229,18 @@ impl<'r> Responder<'r, 'r> for PostSubmissionResponse {
         Response::build_from(Json(&self).respond_to(request)?)
             .status(Status::Created)
             .ok()
+    }
+}
+
+fn map_err(e: QueryError) -> Status {
+    match e {
+        QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
+            if err.eq("Not Found") {
+                Status::NotFound
+            } else {
+                Status::InternalServerError
+            }
+        }
+        _ => Status::InternalServerError,
     }
 }

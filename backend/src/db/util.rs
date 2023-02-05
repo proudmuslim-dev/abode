@@ -14,7 +14,6 @@ use chrono::DateTime;
 use color_eyre::eyre::Context;
 use lazy_static::lazy_static;
 use prisma_client_rust::{Direction, QueryError};
-use rocket::request::FromParam;
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -111,29 +110,6 @@ pub enum WhichNotifications {
     Read,
     Unread,
     All,
-}
-
-impl Category {
-    pub const ALL: [Category; 4] = [
-        Category::Islamism,
-        Category::Modernity,
-        Category::Secularism,
-        Category::Feminism,
-    ];
-}
-
-impl<'a> FromParam<'a> for Category {
-    type Error = strum::ParseError;
-
-    fn from_param(param: &'a str) -> Result<Self, Self::Error> {
-        Ok(match param.to_uppercase().as_str() {
-            "ISLAMISM" => Self::Islamism,
-            "MODERNITY" => Self::Modernity,
-            "SECULARISM" => Self::Secularism,
-            "FEMINISM" => Self::Feminism,
-            _ => return Err(strum::ParseError::VariantNotFound),
-        })
-    }
 }
 
 pub async fn create_post(

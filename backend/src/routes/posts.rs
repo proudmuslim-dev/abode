@@ -69,7 +69,7 @@ pub async fn get_author_section_posts(
 pub async fn delete_post(
     auth_header: AuthHeader<{ AuthLevel::Admin }>,
     section: Category,
-    post: Json<PostDeletion>,
+    post: Json<PostDeletionBody>,
 ) -> Result<Value, Status> {
     let _c = auth_header.verify()?;
 
@@ -83,6 +83,6 @@ pub async fn delete_post(
 }
 
 #[derive(Deserialize)]
-pub struct PostDeletion {
+pub struct PostDeletionBody {
     pub(crate) id: Uuid,
 }

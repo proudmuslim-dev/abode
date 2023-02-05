@@ -14,6 +14,7 @@ use backend::routes::{
 };
 use rocket::fs::{relative, FileServer};
 
+/// Only here as a sanity check, will be removed by v1.0 inshaAllah
 #[get("/")]
 async fn hello() -> &'static str {
     "Hello, world!"

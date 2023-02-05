@@ -20,7 +20,7 @@ impl<'r> Responder<'r, 'r> for LoginResponse {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Notification {
+pub struct NotificationBody {
     pub id: String,
     pub created_at: chrono::DateTime<chrono::FixedOffset>,
     pub recipient_id: String,
@@ -29,7 +29,7 @@ pub struct Notification {
     pub content: NotificationContent,
 }
 
-impl From<notification::Data> for Notification {
+impl From<notification::Data> for NotificationBody {
     fn from(value: notification::Data) -> Self {
         let content = serde_json::from_str::<NotificationContent>(value.content.as_str()).unwrap();
 

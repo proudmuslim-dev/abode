@@ -7,7 +7,7 @@ use crate::{
         headers::{AuthHeader, Verifiable},
         jwt::Claims,
         misc::PaginationFields,
-        responses::Notification,
+        responses::NotificationBody,
     },
 };
 use rocket::{http::Status, serde::json::Json};
@@ -18,15 +18,15 @@ pub async fn get_notifications(
     auth_header: AuthHeader,
     which: Option<WhichNotifications>,
     pagination: PaginationFields,
-) -> Result<Json<Vec<Notification>>, Status> {
+) -> Result<Json<Vec<NotificationBody>>, Status> {
     let which = which.unwrap_or(WhichNotifications::Unread);
     let Claims { sub: user, .. } = auth_header.verify()?;
 
-    let notifs: Vec<Notification> = get_user_notifications(user, which, pagination)
+    let notifs: Vec<NotificationBody> = get_user_notifications(user, which, pagination)
         .await
         .map_err(|_| Status::InternalServerError)?
         .into_iter()
-        .map(Notification::from)
+        .map(NotificationBody::from)
         .collect();
 
     Ok(Json(notifs))
@@ -34,7 +34,10 @@ pub async fn get_notifications(
 
 // NOTE: Can't use patch on frontend because of form limitations
 #[patch("/notifications", data = "<patches>")]
-pub async fn patch_notifications(auth_header: AuthHeader, patches: Json<Vec<NotificationPatch>>) -> Result<(), Status> {
+pub async fn patch_notifications(
+    auth_header: AuthHeader,
+    patches: Json<Vec<PatchNotificationBody>>,
+) -> Result<(), Status> {
     let Claims { sub: user, .. } = auth_header.verify()?;
 
     for p in patches.iter() {
@@ -64,7 +67,7 @@ pub async fn delete_notification(auth_header: AuthHeader, form: Json<DeleteNotif
 }
 
 #[derive(Deserialize)]
-pub struct NotificationPatch {
+pub struct PatchNotificationBody {
     notification_id: Uuid,
     read: bool,
 }
