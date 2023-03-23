@@ -1,12 +1,12 @@
 <div align="center">
 
-# Traveler's Abode - Backend
+# Traveler's Abode 
 
 </div>
 
 ## About
 
-Backend for Traveler's Abode.
+Backend and Frontend for Traveler's Abode.
 
 ## Naming
 
