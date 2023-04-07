@@ -308,11 +308,7 @@ pub async fn confirm_pending_post(
         .await?
     {
         Some(p) => p,
-        None => {
-            return Err(QueryError::Deserialize(serde_value::DeserializerError::Custom(
-                "Not Found".to_owned(),
-            )))
-        }
+        None => return Err(QueryError::Deserialize("Not Found".to_owned())),
     };
 
     remove_pending_post(category, id.clone()).await?;
@@ -354,11 +350,7 @@ pub async fn reject_pending_post(
         .await?
     {
         Some(p) => p,
-        None => {
-            return Err(QueryError::Deserialize(serde_value::DeserializerError::Custom(
-                "Not Found".to_owned(),
-            )))
-        }
+        None => return Err(QueryError::Deserialize("Not Found".to_owned())),
     };
 
     remove_pending_post(category, id.clone()).await?;

@@ -234,7 +234,7 @@ impl<'r> Responder<'r, 'r> for PostSubmissionResponse {
 
 fn map_err(e: QueryError) -> Status {
     match e {
-        QueryError::Deserialize(serde_value::DeserializerError::Custom(err)) => {
+        QueryError::Deserialize(err) => {
             if err.eq("Not Found") {
                 Status::NotFound
             } else {
