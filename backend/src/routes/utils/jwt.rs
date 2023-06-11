@@ -20,15 +20,17 @@ pub struct Claims {
 }
 
 pub fn generate_api_token(subject: Uuid, admin: bool) -> Result<String> {
-    let exp = Utc::now()
-        .checked_add_signed(Duration::hours(6))
-        .expect("valid timestamp")
-        .timestamp();
+    let claims = {
+        let exp = Utc::now()
+            .checked_add_signed(Duration::hours(6))
+            .expect("valid timestamp")
+            .timestamp();
 
-    let claims = Claims {
-        sub: subject,
-        exp: exp as usize,
-        admin,
+        Claims {
+            sub: subject,
+            exp: exp as usize,
+            admin,
+        }
     };
 
     jsonwebtoken::encode(
@@ -39,12 +41,11 @@ pub fn generate_api_token(subject: Uuid, admin: bool) -> Result<String> {
 }
 
 pub fn verify_api_token(token: &str) -> Result<Claims> {
-    match jsonwebtoken::decode::<Claims>(
+    let decoded = jsonwebtoken::decode::<Claims>(
         token,
         &DecodingKey::from_secret(ENCODING_SECRET.as_bytes()),
         &Validation::new(Algorithm::HS256),
-    ) {
-        Ok(t) => Ok(t.claims),
-        Err(e) => Err(e),
-    }
+    )?;
+
+    Ok(decoded.claims)
 }

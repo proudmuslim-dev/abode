@@ -14,7 +14,7 @@ pub async fn browse() -> Template {
 
 #[get("/browse/<category>")]
 pub async fn browse_category(category: Category) -> Result<Template, Status> {
-    let posts = if let Ok(r) = REQWEST_CLIENT
+    let posts = REQWEST_CLIENT
         .get(format!(
             "http://{}/posts/{}",
             BACKEND_URL.as_str(),
@@ -22,13 +22,10 @@ pub async fn browse_category(category: Category) -> Result<Template, Status> {
         ))
         .send()
         .await
-    {
-        r.json::<Vec<BrowsePost>>()
-            .await
-            .expect("If this fails, there's a bug in either the frontend or backend")
-    } else {
-        return Err(Status::InternalServerError);
-    };
+        .map_err(|_| Status::InternalServerError)?
+        .json::<Vec<BrowsePost>>()
+        .await
+        .map_err(|_| Status::InternalServerError)?;
 
     Ok(Template::render("browse", context! { posts }))
 }

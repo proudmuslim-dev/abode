@@ -4,6 +4,7 @@ use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
+use std::marker::ConstParamTy;
 
 pub struct AuthHeader<const T: AuthLevel = { AuthLevel::User }> {
     pub(crate) token: String,
@@ -57,7 +58,7 @@ impl Verifiable for AuthHeader<{ AuthLevel::Admin }> {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, ConstParamTy)]
 pub enum AuthLevel {
     User,
     Admin,

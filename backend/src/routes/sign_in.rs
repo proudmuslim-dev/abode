@@ -32,17 +32,14 @@ pub async fn sign_in(login: Form<Strict<LoginForm>>) -> Result<LoginResponse, St
         return Err(Status::Unauthorized);
     }
 
-    let id = match Uuid::from_str(db_res.id.as_str()) {
-        Ok(i) => i,
-        Err(_) => return Err(Status::InternalServerError),
+    let token = {
+        let id = Uuid::from_str(db_res.id.as_str()).map_err(|_| Status::Unauthorized)?;
+        let admin = matches!(db_res.role, Role::Admin);
+
+        generate_api_token(id, admin).map_err(|_| Status::InternalServerError)?
     };
 
-    let admin = matches!(db_res.role, Role::Admin);
-
-    match generate_api_token(id, admin) {
-        Ok(token) => Ok(LoginResponse { token }),
-        Err(_) => Err(Status::InternalServerError),
-    }
+    Ok(LoginResponse { token })
 }
 
 #[derive(FromForm, Debug, Deserialize, Validate, Sanitize)]

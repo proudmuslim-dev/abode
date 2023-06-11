@@ -54,11 +54,11 @@ pub async fn get_section_submissions(
 ) -> Result<Json<Vec<pending_post::Data>>, Status> {
     let _c = auth_header.verify()?;
 
-    Ok(Json(
-        get_section_pending_posts(section, pagination)
-            .await
-            .map_err(|_| Status::InternalServerError)?,
-    ))
+    let pending_posts = get_section_pending_posts(section, pagination)
+        .await
+        .map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(pending_posts))
 }
 
 #[get("/submissions?<author>&<pagination..>")]
@@ -135,7 +135,7 @@ pub async fn new_submission_image(
         None => return Err(Status::NotFound),
     }
 
-    let ret = {
+    let pending_image = {
         let width = i32::try_from(form.image.width).map_err(|_| Status::BadRequest)?;
         let height = i32::try_from(form.image.height).map_err(|_| Status::BadRequest)?;
         let path = form.image.persist().map_err(|_| Status::InternalServerError)?;
@@ -145,7 +145,7 @@ pub async fn new_submission_image(
             .map_err(|_| Status::InternalServerError)?
     };
 
-    Ok(Json(ret))
+    Ok(Json(pending_image))
 }
 
 #[post("/submissions/<section>/confirm", data = "<post>")]
@@ -158,11 +158,11 @@ pub async fn confirm_submission(
 
     let id = post.id.to_string();
 
-    let ret = confirm_pending_post(section, id, post.comment.clone())
+    let confirmation = confirm_pending_post(section, id, post.comment.clone())
         .await
-        .map_err(map_err)?;
+        .map_err(err_to_status)?;
 
-    Ok(Json(NotificationBody::from(ret)))
+    Ok(Json(NotificationBody::from(confirmation)))
 }
 
 #[delete("/submissions/<section>/reject", data = "<rejection>")]
@@ -175,11 +175,11 @@ pub async fn reject_submission(
 
     let id = rejection.submission_id.to_string();
 
-    let ret = reject_pending_post(section, id, rejection.comment.clone())
+    let rejection = reject_pending_post(section, id, rejection.comment.clone())
         .await
-        .map_err(map_err)?;
+        .map_err(err_to_status)?;
 
-    Ok(Json(NotificationBody::from(ret)))
+    Ok(Json(NotificationBody::from(rejection)))
 }
 
 #[derive(FromForm)]
@@ -232,7 +232,7 @@ impl<'r> Responder<'r, 'r> for PostSubmissionResponse {
     }
 }
 
-fn map_err(e: QueryError) -> Status {
+fn err_to_status(e: QueryError) -> Status {
     match e {
         QueryError::Deserialize(err) => {
             if err.eq("Not Found") {

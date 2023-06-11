@@ -395,9 +395,12 @@ pub async fn update_user_notification(uid: String, id: String, read: bool) -> Re
     Ok(())
 }
 
+/// Deletes the given notification only if the recipient ID matches the uid.
 pub async fn delete_user_notification(uid: String, id: String) -> Result<(), QueryError> {
     notifications()
         .await
+        // Will only delete one due to the unique constraint, delete_many method is used due to
+        // method limitations
         .delete_many(vec![
             notification::WhereParam::RecipientId(StringFilter::Equals(uid)),
             notification::WhereParam::Id(StringFilter::Equals(id)),

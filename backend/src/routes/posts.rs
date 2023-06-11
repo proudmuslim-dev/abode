@@ -33,11 +33,11 @@ pub async fn get_section_posts(
     section: Category,
     pagination: PaginationFields,
 ) -> Result<Json<Vec<post::Data>>, Status> {
-    Ok(Json(
-        db::util::get_section_posts(section, pagination)
-            .await
-            .map_err(|_| Status::InternalServerError)?,
-    ))
+    let posts = db::util::get_section_posts(section, pagination)
+        .await
+        .map_err(|_| Status::InternalServerError)?;
+
+    Ok(Json(posts))
 }
 
 #[get("/posts?<author>&<pagination..>")]

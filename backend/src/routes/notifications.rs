@@ -19,15 +19,17 @@ pub async fn get_notifications(
     which: Option<WhichNotifications>,
     pagination: PaginationFields,
 ) -> Result<Json<Vec<NotificationBody>>, Status> {
-    let which = which.unwrap_or(WhichNotifications::Unread);
-    let Claims { sub: user, .. } = auth_header.verify()?;
+    let notifs: Vec<NotificationBody> = {
+        let which = which.unwrap_or(WhichNotifications::Unread);
+        let Claims { sub: user, .. } = auth_header.verify()?;
 
-    let notifs: Vec<NotificationBody> = get_user_notifications(user, which, pagination)
-        .await
-        .map_err(|_| Status::InternalServerError)?
-        .into_iter()
-        .map(NotificationBody::from)
-        .collect();
+        get_user_notifications(user, which, pagination)
+            .await
+            .map_err(|_| Status::InternalServerError)?
+            .into_iter()
+            .map(NotificationBody::from)
+            .collect()
+    };
 
     Ok(Json(notifs))
 }
@@ -53,17 +55,15 @@ pub async fn patch_notifications(
 pub async fn delete_notification(auth_header: AuthHeader, form: Json<DeleteNotificationForm>) -> Result<(), Status> {
     let Claims { sub: user, admin, .. } = auth_header.verify()?;
 
-    if admin {
-        util::delete_notification(form.id.to_string())
+    if !admin {
+        return util::delete_user_notification(user.to_string(), form.id.to_string())
             .await
-            .map_err(|_| Status::InternalServerError)?;
-    } else {
-        util::delete_user_notification(user.to_string(), form.id.to_string())
-            .await
-            .map_err(|_| Status::InternalServerError)?;
+            .map_err(|_| Status::InternalServerError);
     }
 
-    Ok(())
+    util::delete_notification(form.id.to_string())
+        .await
+        .map_err(|_| Status::InternalServerError)
 }
 
 #[derive(Deserialize)]

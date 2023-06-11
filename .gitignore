@@ -1,1 +1,6 @@
 /target
+/.idea
+
+# Will add to repository when finished
+/Dockerfile
+/docker-compose.yml

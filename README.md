@@ -1,3 +1,9 @@
+# TODO
+
+* CSRF is already handled by samesite=strict
+* Read up on CORS - https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+* CSP (Content Security Policy) - https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
 <div align="center">
 
 # Traveler's Abode 
