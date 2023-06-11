@@ -10,13 +10,13 @@ jsonwebtoken = "8.3.0"
 color-eyre = "0.6.2"
 lazy_static = "1.4.0"
 paste = "1.0.12"
-pulldown-cmark = "0.9.2"
+pulldown-cmark = "0.9.3"
 ammonia = "3.3.0"
 async_once = "0.2.6"
-serde_json = "1.0.95"
+serde_json = "1.0.96"
 serde-value = "0.7.0"
 kamadak-exif = "0.5.5"
-imagesize = "0.11.0"
+imagesize = "0.12.0"
 
 [dependencies.image]
 version = "0.24.6"
@@ -29,16 +29,16 @@ features = ["full"]
 
 [dependencies.prisma-client-rust]
 git = "https://github.com/Brendonovich/prisma-client-rust"
-tag = "0.6.7"
+tag = "0.6.8"
 default-features = false
 features = ["mysql"]
 
 [dependencies.chrono]
-version = "0.4.24"
+version = "0.4.26"
 features = ["serde"]
 
 [dependencies.rocket]
-version = "0.5.0-rc.2"
+version = "0.5.0-rc.3"
 features = ["json"]
 
 [dependencies.serde]

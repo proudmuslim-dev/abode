@@ -11,12 +11,12 @@ serde = "1"
 
 [dependencies.prisma-client-rust]
 git = "https://github.com/Brendonovich/prisma-client-rust"
-tag = "0.6.7"
+tag = "0.6.8"
 default-features = false
 features = ["mysql"]
 
 [dependencies.prisma-client-rust-cli]
 git = "https://github.com/Brendonovich/prisma-client-rust"
-tag = "0.6.7"
+tag = "0.6.8"
 default-features = false
 features = ["mysql"]
